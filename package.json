@@ -1,6 +1,10 @@
 {
   "name": "es-drager-react",
   "private": true,
+  "packageManager": "bun@1.1.17",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
@@ -8,14 +12,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^3.11.2",
+    "eslint": "^9.16.0",
     "prettier": "^3.2.5",
     "turbo": "^2.3.3",
     "typescript": "5.5.4"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "bun@1.1.17",
   "workspaces": [
     "apps/*",
     "packages/*"
