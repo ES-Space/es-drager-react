@@ -1,7 +1,7 @@
 'use client'
 
+import { Drager } from '@es-space/es-drager-react'
 import { useEffect, useRef, useState } from 'react'
-import { Drager } from 'react-drager'
 
 export function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null)

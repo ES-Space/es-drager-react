@@ -16,7 +16,7 @@
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
-    "react-drager": "workspace:*",
+    "@es-space/es-drager-react": "workspace:*",
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {

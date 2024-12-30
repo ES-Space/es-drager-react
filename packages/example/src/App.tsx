@@ -1,4 +1,4 @@
-import { Drager } from 'react-drager'
+import { Drager } from '@es-space/es-drager-react'
 
 function App() {
   return (
