@@ -5,7 +5,6 @@ orbs:
   node: circleci/node@5
 jobs:
   build-node:
-    # Build node project
     executor: node/default
     steps:
       - checkout
@@ -17,19 +16,15 @@ jobs:
             echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
             echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
-      # 使用 bun 安装依赖
+      # 只构建包
       - run:
-          name: Install Dependencies
-          command: bun install
-      - run:
-          command: bun run build
+          name: Build package
+          command: cd packages/react-drager && bun install && bun run build
       - persist_to_workspace:
           root: .
           paths:
-            - packages/*/dist
-            - packages/*/package.json
-            - package.json
-            - bun.lockb
+            - packages/react-drager/dist
+            - packages/react-drager/package.json
 
   publish-npm:
     executor: node/default
