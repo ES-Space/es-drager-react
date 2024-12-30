@@ -9,11 +9,16 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          cache-path: ~/project/node_modules
-          override-ci-command: npm install --legacy-peer-deps
+      # 安装 pnpm
       - run:
-          command: npm run build
+          name: Install pnpm
+          command: npm install -g pnpm
+      # 使用 pnpm 安装依赖
+      - run:
+          name: Install Dependencies
+          command: pnpm install --no-frozen-lockfile
+      - run:
+          command: pnpm run build
       - run:
           name: Create the ~/artifacts directory if it doesn't exist
           command: mkdir -p ~/artifacts
