@@ -1,7 +1,8 @@
 {
-  "name": "react-drager",
+  "name": "@es-space/es-drager-react",
   "type": "module",
   "version": "0.0.1",
+  "description": "A React component for dragging, rotating and scaling",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
