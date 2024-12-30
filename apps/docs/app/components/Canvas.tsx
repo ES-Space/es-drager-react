@@ -4,6 +4,12 @@ import { Drager } from '@es-space/es-drager-react'
 import { useEffect, useRef, useState } from 'react'
 
 export function Canvas() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const containerRef = useRef<HTMLDivElement>(null)
   const [bounds, setBounds] = useState({ maxX: 0, maxY: 0 })
 
@@ -26,6 +32,9 @@ export function Canvas() {
     observer.observe(containerRef.current)
     return () => observer.disconnect()
   }, [])
+
+  if (!isClient)
+    return null
 
   return (
     <div className="flex-1 bg-gray-50">
