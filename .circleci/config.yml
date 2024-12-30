@@ -23,29 +23,36 @@ jobs:
           command: bun install
       - run:
           command: bun run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+      - persist_to_workspace:
+          root: .
+          paths:
+            - packages/*/dist
+            - packages/*/package.json
+            - package.json
+            - bun.lockb
+
+  publish-npm:
+    executor: node/default
     steps:
-      # Replace this with steps to deploy to users
+      - attach_workspace:
+          at: .
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
+          name: Publish package
+          command: cd packages/react-drager && npm publish --access public
+
 workflows:
-  build:
+  version: 2
+  build-and-publish:
     jobs:
       - build-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+      - publish-npm:
+          requires:
+            - build-node
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /^v.*/
