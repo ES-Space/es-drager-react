@@ -9,16 +9,20 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      # 安装 pnpm
+      # 安装 bun
       - run:
-          name: Install pnpm
-          command: npm install -g pnpm
-      # 使用 pnpm 安装依赖
+          name: Install bun
+          command: |
+            curl -fsSL https://bun.sh/install | bash
+            echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
+            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      # 使用 bun 安装依赖
       - run:
           name: Install Dependencies
-          command: pnpm install --no-frozen-lockfile
+          command: bun install
       - run:
-          command: pnpm run build
+          command: bun run build
       - run:
           name: Create the ~/artifacts directory if it doesn't exist
           command: mkdir -p ~/artifacts
