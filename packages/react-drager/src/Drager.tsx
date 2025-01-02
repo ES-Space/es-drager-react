@@ -1,16 +1,22 @@
 import type { DragerProps } from './types'
 import { RotateCw } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
+import { getDragerElements, getSnapPosition } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
   children,
   className,
+  style,
   limit,
   rotation = 0,
   rotatable = false,
   scalable = false,
   minScale = 0.5,
   maxScale = 2,
+  showGuides = false,
+  snapThreshold = 5,
+  snapToElements = true,
+
   onDragStart,
   onDragEnd,
   onDrag,
@@ -21,11 +27,16 @@ export const Drager: React.FC<DragerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const rotateHandleRef = useRef<HTMLDivElement>(null)
   const startPos = useRef({ x: 0, y: 0 })
-  const currentPos = useRef({ x: 0, y: 0 })
+  const currentPos = useRef({
+    x: style?.left ? Number.parseInt(style.left as string) : 0,
+    y: style?.top ? Number.parseInt(style.top as string) : 0,
+  })
   const currentRotation = useRef(rotation)
   const isDragging = useRef(false)
   const isRotating = useRef(false)
   const currentScale = useRef(1)
+  const lastSnapPos = useRef<{ x: number, y: number } | null>(null)
+  const snapTimeout = useRef<number>()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -39,17 +50,15 @@ export const Drager: React.FC<DragerProps> = ({
       return
 
     const updateCanvasSize = () => {
+      if (!canvas)
+        return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
+
     updateCanvasSize()
     window.addEventListener('resize', updateCanvasSize)
 
-    /**
-     * Limit the position of the content
-     * @param pos - The position to limit
-     * @returns The limited position
-     */
     const limitPosition = (pos: { x: number, y: number }) => {
       if (!limit)
         return pos
@@ -59,16 +68,53 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    /**
-     * Draw the content on the canvas
-     */
     const updateTransform = () => {
       content.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
+    }
+
+    const drawGuides = () => {
+      if (!canvas || !ctx || !content || !isDragging.current || !showGuides)
+        return
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.strokeStyle = '#ccc'
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 4])
+
+      const rect = content.getBoundingClientRect()
+
+      // 绘制四条边的辅助线
+      // 左边
+      ctx.beginPath()
+      ctx.moveTo(rect.left, 0)
+      ctx.lineTo(rect.left, canvas.height)
+      ctx.stroke()
+
+      // 右边
+      ctx.beginPath()
+      ctx.moveTo(rect.right, 0)
+      ctx.lineTo(rect.right, canvas.height)
+      ctx.stroke()
+
+      // 顶边
+      ctx.beginPath()
+      ctx.moveTo(0, rect.top)
+      ctx.lineTo(canvas.width, rect.top)
+      ctx.stroke()
+
+      // 底边
+      ctx.beginPath()
+      ctx.moveTo(0, rect.bottom)
+      ctx.lineTo(canvas.width, rect.bottom)
+      ctx.stroke()
     }
 
     const draw = () => {
       if (isDragging.current || isRotating.current) {
         updateTransform()
+        if (isDragging.current && showGuides) {
+          drawGuides()
+        }
       }
       requestAnimationFrame(draw)
     }
@@ -76,7 +122,6 @@ export const Drager: React.FC<DragerProps> = ({
     const handleMouseDown = (e: MouseEvent) => {
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
-
       e.preventDefault()
       isDragging.current = true
       onDragStart?.()
@@ -86,10 +131,6 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    /**
-     * Handle the start of rotation
-     * @param e - The mouse event
-     */
     const handleRotateStart = (e: MouseEvent) => {
       if (!rotatable)
         return
@@ -110,19 +151,49 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    /**
-     * Handle the movement of the content
-     * @param e - The mouse event
-     */
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging.current) {
         const newPos = {
           x: e.clientX - startPos.current.x,
           y: e.clientY - startPos.current.y,
         }
-        currentPos.current = limitPosition(newPos)
+
+        if (snapToElements && content) {
+          const otherElements = getDragerElements().filter(el => el !== content) as HTMLDivElement[]
+          const rect = content.getBoundingClientRect()
+
+          if (lastSnapPos.current) {
+            const snapDistance = Math.hypot(
+              newPos.x - lastSnapPos.current.x,
+              newPos.y - lastSnapPos.current.y,
+            )
+            if (snapDistance < snapThreshold * 1.5) {
+              currentPos.current = lastSnapPos.current
+              return
+            }
+            lastSnapPos.current = null
+          }
+
+          if (snapTimeout.current)
+            window.clearTimeout(snapTimeout.current)
+
+          const snappedPos = getSnapPosition(newPos, rect, otherElements, snapThreshold)
+
+          if (snappedPos.x !== newPos.x || snappedPos.y !== newPos.y) {
+            lastSnapPos.current = snappedPos
+            snapTimeout.current = window.setTimeout(() => {
+              lastSnapPos.current = null
+            }, 100)
+          }
+
+          currentPos.current = limitPosition(snappedPos)
+        }
+        else {
+          currentPos.current = limitPosition(newPos)
+        }
+
         onDrag?.(currentPos.current)
-        content.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
+        updateTransform()
       }
 
       if (isRotating.current) {
@@ -137,19 +208,18 @@ export const Drager: React.FC<DragerProps> = ({
 
         const angleDiff = currentAngle - startPos.current.x
         currentRotation.current = startPos.current.y + angleDiff
-
-        content.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
         onRotate?.(currentRotation.current)
       }
     }
 
-    /**
-     * Handle the end of dragging or rotation
-     */
     const handleMouseUp = () => {
       if (isDragging.current) {
         isDragging.current = false
         onDragEnd?.()
+        // 清除辅助线
+        if (canvas && ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+        }
       }
       if (isRotating.current) {
         isRotating.current = false
@@ -160,13 +230,11 @@ export const Drager: React.FC<DragerProps> = ({
       if (!scalable)
         return
       e.preventDefault()
-
       const delta = e.deltaY * -0.01
       const newScale = Math.min(
         Math.max(currentScale.current + delta, minScale),
         maxScale,
       )
-
       currentScale.current = newScale
       updateTransform()
       onScale?.(newScale)
@@ -195,7 +263,7 @@ export const Drager: React.FC<DragerProps> = ({
         content.removeEventListener('wheel', handleWheel)
       }
     }
-  }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale])
+  }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements])
 
   return (
     <>
@@ -205,12 +273,15 @@ export const Drager: React.FC<DragerProps> = ({
           position: 'fixed',
           top: 0,
           left: 0,
+          width: '100vw',
+          height: '100vh',
           pointerEvents: 'none',
-          zIndex: 1,
+          zIndex: 1000,
         }}
       />
       <div
         ref={contentRef}
+        data-drager
         className={className}
         style={{
           position: 'absolute',

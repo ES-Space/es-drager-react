@@ -10,12 +10,14 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "docs:dev": "turbo run dev --filter=docs",
+    "docs:dev": "concurrently \"turbo run dev --filter=docs -- --port 3001\" \"open-cli http://localhost:3001\"",
     "docs:build": "turbo run build --filter=docs"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.11.2",
+    "concurrently": "^9.1.2",
     "eslint": "^9.16.0",
+    "open-cli": "^8.0.0",
     "prettier": "^3.2.5",
     "turbo": "^2.3.3",
     "typescript": "5.5.4"

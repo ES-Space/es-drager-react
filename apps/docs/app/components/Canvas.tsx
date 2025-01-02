@@ -4,14 +4,11 @@ import { Drager } from '@es-space/es-drager-react'
 import { useEffect, useRef, useState } from 'react'
 
 export function Canvas() {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
   const containerRef = useRef<HTMLDivElement>(null)
-  const [bounds, setBounds] = useState({ maxX: 0, maxY: 0 })
+  const [bounds, setBounds] = useState({
+    maxX: window.innerWidth, // 默认宽度
+    maxY: window.innerHeight, // 默认高度
+  })
 
   useEffect(() => {
     if (!containerRef.current)
@@ -23,18 +20,17 @@ export function Canvas() {
         return
 
       const { width, height } = container.contentRect
+
+      // 更新拖拽边界
       setBounds({
-        maxX: width - 96, // 减去 Drager 的宽度 (w-24 = 96px)
-        maxY: height - 96, // 减去 Drager 的高度
+        maxX: width - 96, // Drager 宽度 (96px)
+        maxY: height - 96, // Drager 高度
       })
     })
 
     observer.observe(containerRef.current)
     return () => observer.disconnect()
   }, [])
-
-  if (!isClient)
-    return null
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -106,6 +102,48 @@ export function Canvas() {
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-xs font-medium">Scalable Box</div>
                   <div className="text-[10px] text-gray-400">Use mouse wheel</div>
+                </div>
+              </Drager>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-8 shadow-sm">
+            <h3 className="text-sm font-medium mb-4">With Guidelines</h3>
+            <div className="h-[200px] relative border rounded-lg">
+              <Drager
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
+                showGuides
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">With Guidelines</div>
+                  <div className="text-[10px] text-gray-400">Drag to see guides</div>
+                </div>
+              </Drager>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-8 shadow-sm">
+            <h3 className="text-sm font-medium mb-4">With Snapping</h3>
+            <div className="h-[200px] relative border rounded-lg">
+              <Drager
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
+                snapToElements
+                snapThreshold={10}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">Snap Box 1</div>
+                  <div className="text-[10px] text-gray-400">Try snapping</div>
+                </div>
+              </Drager>
+              <Drager
+                className="w-32 h-32 border-2 border-dashed border-green-500 cursor-move flex items-center justify-center text-green-500"
+                style={{ left: '200px' }}
+                snapToElements
+                snapThreshold={10}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">Snap Box 2</div>
+                  <div className="text-[10px] text-gray-400">Try snapping</div>
                 </div>
               </Drager>
             </div>
