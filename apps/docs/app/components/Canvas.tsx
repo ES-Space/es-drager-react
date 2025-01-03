@@ -1,7 +1,14 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+interface Connection {
+  sourceId: string
+  sourceAnchor: string
+  targetId: string
+  targetAnchor: string
+}
 
 export function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -9,6 +16,7 @@ export function Canvas() {
     maxX: window.innerWidth, // 默认宽度
     maxY: window.innerHeight, // 默认高度
   })
+  const [connections, setConnections] = useState<Connection[]>([])
 
   useEffect(() => {
     if (!containerRef.current)
@@ -32,8 +40,17 @@ export function Canvas() {
     return () => observer.disconnect()
   }, [])
 
+  const handleConnect = useCallback((sourceId: string, sourceAnchor: string, targetId: string, targetAnchor: string) => {
+    setConnections(prev => [...prev, {
+      sourceId,
+      sourceAnchor,
+      targetId,
+      targetAnchor,
+    }])
+  }, [])
+
   return (
-    <div className="flex-1 bg-gray-50">
+    <div className="flex-1 p-8 bg-gray-50">
       <div className="max-w-screen-xl mx-auto p-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="bg-white rounded-lg p-8 shadow-sm">
@@ -149,7 +166,82 @@ export function Canvas() {
             </div>
           </div>
         </div>
+
+        <div className="bg-white rounded-lg p-8 shadow-sm mt-8">
+          <h3 className="text-sm font-medium mb-4">With Connections</h3>
+          <div className="text-xs text-gray-500 mb-4">
+            Hover over the blue dots and drag to another dot to create a connection
+          </div>
+          <div className="h-[200px] relative border rounded-lg">
+            <Drager
+              id="drager1"
+              className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
+              connectable
+              onConnect={handleConnect}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <div className="text-xs font-medium">Drager 1</div>
+                <div className="text-[10px] text-gray-400">Connect me!</div>
+              </div>
+            </Drager>
+
+            <Drager
+              id="drager2"
+              className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
+              style={{ left: '200px' }}
+              connectable
+              onConnect={handleConnect}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <div className="text-xs font-medium">Drager 2</div>
+                <div className="text-[10px] text-gray-400">Connect me!</div>
+              </div>
+            </Drager>
+
+            {/* Render connections */}
+            {connections.map((conn, index) => (
+              <svg
+                key={index}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                }}
+              >
+                <path
+                  d={`M ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).x} ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).y} 
+                     C ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).x + 50} ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).y},
+                       ${getAnchorPosition(conn.targetId, conn.targetAnchor).x - 50} ${getAnchorPosition(conn.targetId, conn.targetAnchor).y},
+                       ${getAnchorPosition(conn.targetId, conn.targetAnchor).x} ${getAnchorPosition(conn.targetId, conn.targetAnchor).y}`}
+                  stroke="#3b82f6"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
+}
+
+// Helper function to get anchor positions
+function getAnchorPosition(dragerId: string, anchor: string) {
+  const el = document.querySelector(`[data-drager-id="${dragerId}"]`)
+  if (!el)
+    return { x: 0, y: 0 }
+
+  const rect = el.getBoundingClientRect()
+  const positions = {
+    top: { x: rect.left + rect.width / 2, y: rect.top },
+    right: { x: rect.right, y: rect.top + rect.height / 2 },
+    bottom: { x: rect.left + rect.width / 2, y: rect.bottom },
+    left: { x: rect.left, y: rect.top + rect.height / 2 },
+  }
+
+  return positions[anchor as keyof typeof positions]
 }

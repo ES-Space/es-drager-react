@@ -1,3 +1,5 @@
+import type { AnchorPosition } from '../types'
+
 export function getDragerElements(): HTMLElement[] {
   return Array.from(document.querySelectorAll('[data-drager]'))
 }
@@ -54,4 +56,40 @@ export function getSnapPosition(
   })
 
   return result
+}
+
+export function drawTempConnection(
+  ctx: CanvasRenderingContext2D,
+  start: { x: number, y: number },
+  end: { x: number, y: number },
+) {
+  const offsetX = Math.abs(end.x - start.x) * 0.5
+
+  ctx.beginPath()
+  ctx.strokeStyle = '#3b82f6'
+  ctx.lineWidth = 2
+  ctx.setLineDash([5, 5])
+
+  ctx.moveTo(start.x, start.y)
+  ctx.bezierCurveTo(
+    start.x + offsetX,
+    start.y,
+    end.x - offsetX,
+    end.y,
+    end.x,
+    end.y,
+  )
+
+  ctx.stroke()
+  ctx.setLineDash([])
+}
+
+export function getAnchorPosition(rect: DOMRect, position: AnchorPosition) {
+  const positions = {
+    top: { x: rect.left + rect.width / 2, y: rect.top },
+    right: { x: rect.right, y: rect.top + rect.height / 2 },
+    bottom: { x: rect.left + rect.width / 2, y: rect.bottom },
+    left: { x: rect.left, y: rect.top + rect.height / 2 },
+  }
+  return positions[position]
 }
