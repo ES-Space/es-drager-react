@@ -4,46 +4,54 @@ export function getDragerElements(): HTMLElement[] {
 
 export function getSnapPosition(
   pos: { x: number, y: number },
-  currentRect: DOMRect,
-  elements: HTMLElement[],
+  rect: DOMRect,
+  elements: HTMLDivElement[],
   threshold: number,
 ) {
-  const snappedPos = { ...pos }
+  const result = { ...pos }
 
-  elements.forEach((element) => {
-    const elementRect = element.getBoundingClientRect()
+  // 中心线
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
 
-    // 转换为相对位置
-    const currentLeft = pos.x
-    const currentRight = pos.x + currentRect.width
-    const currentTop = pos.y
-    const currentBottom = pos.y + currentRect.height
+  elements.forEach((el) => {
+    const elRect = el.getBoundingClientRect()
+    const elCenterX = elRect.left + elRect.width / 2
+    const elCenterY = elRect.top + elRect.height / 2
 
-    const targetLeft = elementRect.left - currentRect.left + pos.x
-    const targetRight = elementRect.right - currentRect.left + pos.x
-    const targetTop = elementRect.top - currentRect.top + pos.y
-    const targetBottom = elementRect.bottom - currentRect.top + pos.y
+    // 检查边缘和中心线
+    const snapPoints = [
+      // 水平对齐点
+      { source: rect.left, target: elRect.left }, // 左对左
+      { source: rect.right, target: elRect.right }, // 右对右
+      { source: rect.left, target: elRect.right }, // 左对右
+      { source: rect.right, target: elRect.left }, // 右对左
+      { source: centerX, target: elCenterX }, // 中心对中心
+
+      // 垂直对齐点
+      { source: rect.top, target: elRect.top }, // 上对上
+      { source: rect.bottom, target: elRect.bottom }, // 下对下
+      { source: rect.top, target: elRect.bottom }, // 上对下
+      { source: rect.bottom, target: elRect.top }, // 下对上
+      { source: centerY, target: elCenterY }, // 中心对中心
+    ]
 
     // 水平吸附
-    if (Math.abs(currentLeft - targetLeft) < threshold)
-      snappedPos.x = targetLeft
-    if (Math.abs(currentRight - targetLeft) < threshold)
-      snappedPos.x = targetLeft - currentRect.width
-    if (Math.abs(currentLeft - targetRight) < threshold)
-      snappedPos.x = targetRight
-    if (Math.abs(currentRight - targetRight) < threshold)
-      snappedPos.x = targetRight - currentRect.width
+    snapPoints.slice(0, 5).forEach(({ source, target }) => {
+      const diff = Math.abs(source - target)
+      if (diff < threshold) {
+        result.x = pos.x - (source - target)
+      }
+    })
 
     // 垂直吸附
-    if (Math.abs(currentTop - targetTop) < threshold)
-      snappedPos.y = targetTop
-    if (Math.abs(currentBottom - targetTop) < threshold)
-      snappedPos.y = targetTop - currentRect.height
-    if (Math.abs(currentTop - targetBottom) < threshold)
-      snappedPos.y = targetBottom
-    if (Math.abs(currentBottom - targetBottom) < threshold)
-      snappedPos.y = targetBottom - currentRect.height
+    snapPoints.slice(5).forEach(({ source, target }) => {
+      const diff = Math.abs(source - target)
+      if (diff < threshold) {
+        result.y = pos.y - (source - target)
+      }
+    })
   })
 
-  return snappedPos
+  return result
 }

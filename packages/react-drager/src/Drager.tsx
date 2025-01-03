@@ -35,8 +35,6 @@ export const Drager: React.FC<DragerProps> = ({
   const isDragging = useRef(false)
   const isRotating = useRef(false)
   const currentScale = useRef(1)
-  const lastSnapPos = useRef<{ x: number, y: number } | null>(null)
-  const snapTimeout = useRef<number>()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -160,31 +158,20 @@ export const Drager: React.FC<DragerProps> = ({
 
         if (snapToElements && content) {
           const otherElements = getDragerElements().filter(el => el !== content) as HTMLDivElement[]
-          const rect = content.getBoundingClientRect()
 
-          if (lastSnapPos.current) {
-            const snapDistance = Math.hypot(
-              newPos.x - lastSnapPos.current.x,
-              newPos.y - lastSnapPos.current.y,
-            )
-            if (snapDistance < snapThreshold * 1.5) {
-              currentPos.current = lastSnapPos.current
-              return
-            }
-            lastSnapPos.current = null
-          }
+          const currentRect = content.getBoundingClientRect()
 
-          if (snapTimeout.current)
-            window.clearTimeout(snapTimeout.current)
+          const offsetX = newPos.x - currentPos.current.x
+          const offsetY = newPos.y - currentPos.current.y
 
-          const snappedPos = getSnapPosition(newPos, rect, otherElements, snapThreshold)
+          const simulatedRect = new DOMRect(
+            currentRect.x + offsetX,
+            currentRect.y + offsetY,
+            currentRect.width,
+            currentRect.height,
+          )
 
-          if (snappedPos.x !== newPos.x || snappedPos.y !== newPos.y) {
-            lastSnapPos.current = snappedPos
-            snapTimeout.current = window.setTimeout(() => {
-              lastSnapPos.current = null
-            }, 100)
-          }
+          const snappedPos = getSnapPosition(newPos, simulatedRect, otherElements, snapThreshold)
 
           currentPos.current = limitPosition(snappedPos)
         }
@@ -192,8 +179,14 @@ export const Drager: React.FC<DragerProps> = ({
           currentPos.current = limitPosition(newPos)
         }
 
-        onDrag?.(currentPos.current)
-        updateTransform()
+        if (!content.style.willChange) {
+          content.style.willChange = 'transform'
+        }
+
+        requestAnimationFrame(() => {
+          updateTransform()
+          onDrag?.(currentPos.current)
+        })
       }
 
       if (isRotating.current) {
@@ -216,6 +209,9 @@ export const Drager: React.FC<DragerProps> = ({
       if (isDragging.current) {
         isDragging.current = false
         onDragEnd?.()
+        if (content) {
+          content.style.willChange = ''
+        }
         // 清除辅助线
         if (canvas && ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
