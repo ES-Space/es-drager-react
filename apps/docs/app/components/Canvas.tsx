@@ -16,7 +16,12 @@ export function Canvas() {
     maxX: window.innerWidth, // 默认宽度
     maxY: window.innerHeight, // 默认高度
   })
-  const [connections, setConnections] = useState<Connection[]>([])
+  const [_, setConnections] = useState<Connection[]>([])
+  const [dragers] = useState([
+    { id: 'drager-1', label: 'Drager 1', x: 100, y: 20 },
+    { id: 'drager-2', label: 'Drager 2', x: 300, y: 20 },
+    { id: 'drager-3', label: 'Drager 3', x: 500, y: 20 },
+  ])
 
   useEffect(() => {
     if (!containerRef.current)
@@ -143,26 +148,25 @@ export function Canvas() {
             <h3 className="text-sm font-medium mb-4">With Snapping</h3>
             <div className="h-[200px] relative border rounded-lg">
               <Drager
-                id="snap1"
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                 snapToElements
                 snapThreshold={5}
               >
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-xs font-medium">Snap Box 1</div>
-                  <div className="text-[10px] text-gray-400">Try snapping</div>
+                  <div className="text-[10px] text-gray-400">Try dragging me</div>
                 </div>
               </Drager>
+
               <Drager
-                id="snap2"
                 className="w-32 h-32 border-2 border-dashed border-green-500 cursor-move flex items-center justify-center text-green-500"
-                style={{ left: '180px' }}
+                style={{ left: '200px' }}
                 snapToElements
                 snapThreshold={5}
               >
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-xs font-medium">Snap Box 2</div>
-                  <div className="text-[10px] text-gray-400">Try snapping</div>
+                  <div className="text-[10px] text-gray-400">Try dragging me</div>
                 </div>
               </Drager>
             </div>
@@ -175,75 +179,29 @@ export function Canvas() {
             Hover over the blue dots and drag to another dot to create a connection
           </div>
           <div className="h-[200px] relative border rounded-lg">
-            <Drager
-              id="drager1"
-              className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
-              connectable
-              onConnect={handleConnect}
-            >
-              <div className="flex flex-col items-center gap-1">
-                <div className="text-xs font-medium">Drager 1</div>
-                <div className="text-[10px] text-gray-400">Connect me!</div>
-              </div>
-            </Drager>
-
-            <Drager
-              id="drager2"
-              className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
-              style={{ left: '200px' }}
-              connectable
-              onConnect={handleConnect}
-            >
-              <div className="flex flex-col items-center gap-1">
-                <div className="text-xs font-medium">Drager 2</div>
-                <div className="text-[10px] text-gray-400">Connect me!</div>
-              </div>
-            </Drager>
-
-            {/* Render connections */}
-            {connections.map((conn, index) => (
-              <svg
-                key={index}
+            {dragers.map(drager => (
+              <Drager
+                key={drager.id}
+                id={drager.id}
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
+                connectable
+                onConnect={handleConnect}
                 style={{
                   position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
+                  left: drager.x,
+                  top: drager.y,
                 }}
               >
-                <path
-                  d={`M ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).x} ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).y} 
-                     C ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).x + 50} ${getAnchorPosition(conn.sourceId, conn.sourceAnchor).y},
-                       ${getAnchorPosition(conn.targetId, conn.targetAnchor).x - 50} ${getAnchorPosition(conn.targetId, conn.targetAnchor).y},
-                       ${getAnchorPosition(conn.targetId, conn.targetAnchor).x} ${getAnchorPosition(conn.targetId, conn.targetAnchor).y}`}
-                  stroke="#3b82f6"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">{drager.label}</div>
+                  <div className="text-[10px] text-gray-400">Connect me!</div>
+                </div>
+              </Drager>
             ))}
+
           </div>
         </div>
       </div>
     </div>
   )
-}
-
-// Helper function to get anchor positions
-function getAnchorPosition(dragerId: string, anchor: string) {
-  const el = document.querySelector(`[data-drager-id="${dragerId}"]`)
-  if (!el)
-    return { x: 0, y: 0 }
-
-  const rect = el.getBoundingClientRect()
-  const positions = {
-    top: { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top) },
-    right: { x: Math.round(rect.right), y: Math.round(rect.top + rect.height / 2) },
-    bottom: { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.bottom) },
-    left: { x: Math.round(rect.left), y: Math.round(rect.top + rect.height / 2) },
-  }
-
-  return positions[anchor as keyof typeof positions]
 }

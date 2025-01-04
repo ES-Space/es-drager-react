@@ -5,8 +5,11 @@ import { Anchor } from './components/Anchor'
 import { ConnectionManager } from './ConnectionManager'
 import { drawTempConnection, getAnchorPosition, getDragerElements, getSnapPosition } from './utils'
 
+// generate unique id
+const generateUniqueId = () => `drager-${Math.random().toString(36).slice(2, 11)}`
+
 export const Drager: React.FC<DragerProps> = ({
-  id,
+  id = generateUniqueId(),
   children,
   className,
   style,
@@ -51,13 +54,12 @@ export const Drager: React.FC<DragerProps> = ({
       return
 
     const dpr = window.devicePixelRatio || 1
-    // 设置 canvas 尺寸
     canvasRef.current.style.width = `${window.innerWidth}px`
     canvasRef.current.style.height = `${window.innerHeight}px`
     canvasRef.current.width = window.innerWidth * dpr
     canvasRef.current.height = window.innerHeight * dpr
 
-    // 应用 DPR 缩放
+    // fix dpr
     ctx.scale(dpr, dpr)
 
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -72,7 +74,7 @@ export const Drager: React.FC<DragerProps> = ({
     let endPos = { x: e.clientX, y: e.clientY }
     let isSnapped = false
 
-    // 检查是否靠近目标锚点
+    // check if near target anchor
     if (targetAnchor && targetDrager) {
       const targetId = targetDrager.getAttribute('data-drager-id')
       if (targetId !== id) {
@@ -80,14 +82,14 @@ export const Drager: React.FC<DragerProps> = ({
         const targetPosition = targetAnchor.getAttribute('data-position') as AnchorPosition
         const anchorPos = getAnchorPosition(targetRect, targetPosition)
 
-        // 计算鼠标与锚点的距离
+        // calculate distance between mouse and anchor
         const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
 
-        // 如果距离小于20px，就吸附到锚点
+        // if distance less than 20px, snap to anchor
         if (distance < 20) {
           endPos = anchorPos
           isSnapped = true
-          targetAnchor.classList.add('anchor-hover') // 可选：添加视觉反馈
+          targetAnchor.classList.add('anchor-hover') // optional: add visual feedback
         }
         else {
           targetAnchor.classList.remove('anchor-hover')
@@ -95,7 +97,7 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    // 如果没有吸附，移除所有锚点的hover效果
+    // if not snapped, remove all anchor hover effect
     if (!isSnapped) {
       document.querySelectorAll('.anchor').forEach((anchor) => {
         anchor.classList.remove('anchor-hover')
@@ -122,7 +124,7 @@ export const Drager: React.FC<DragerProps> = ({
         const anchorPos = getAnchorPosition(targetRect, targetPosition)
         const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
 
-        // 如果在吸附范围内，创建连接
+        // if in snap range, create connection
         if (distance < 20) {
           const connectionManager = ConnectionManager.getInstance()
           connectionManager.addConnection({
@@ -136,7 +138,7 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    // 清理状态
+    // clean up state
     connectingAnchor.current = null
     document.querySelectorAll('.anchor').forEach((anchor) => {
       anchor.classList.remove('anchor-hover')
@@ -196,26 +198,25 @@ export const Drager: React.FC<DragerProps> = ({
 
       const rect = content.getBoundingClientRect()
 
-      // 绘制四条边的辅助线
-      // 左边
+      // left
       ctx.beginPath()
       ctx.moveTo(rect.left, 0)
       ctx.lineTo(rect.left, canvas.height)
       ctx.stroke()
 
-      // 右边
+      // right
       ctx.beginPath()
       ctx.moveTo(rect.right, 0)
       ctx.lineTo(rect.right, canvas.height)
       ctx.stroke()
 
-      // 顶边
+      // top
       ctx.beginPath()
       ctx.moveTo(0, rect.top)
       ctx.lineTo(canvas.width, rect.top)
       ctx.stroke()
 
-      // 底边
+      // bottom
       ctx.beginPath()
       ctx.moveTo(0, rect.bottom)
       ctx.lineTo(canvas.width, rect.bottom)
@@ -234,11 +235,9 @@ export const Drager: React.FC<DragerProps> = ({
         drawGuides()
       }
 
-      // 绘制所有连接
       connectionManager.drawConnections()
 
       if (connectingAnchor.current) {
-        // 绘制正在创建的连接
         const sourceRect = content.getBoundingClientRect()
         const sourcePos = getAnchorPosition(sourceRect, connectingAnchor.current)
         drawTempConnection(ctx, sourcePos, { x: currentMousePos.current.x, y: currentMousePos.current.y })
@@ -269,7 +268,7 @@ export const Drager: React.FC<DragerProps> = ({
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
 
-      // 存储初始角度和当前旋转值
+      // store initial angle and current rotation
       startRotation.current = {
         angle: Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI,
         rotation: currentRotation.current,
@@ -289,7 +288,7 @@ export const Drager: React.FC<DragerProps> = ({
           e.clientX - centerX,
         ) * 180 / Math.PI
 
-        // 计算角度差并更新旋转值
+        // calculate angle difference and update rotation
         const angleDiff = currentAngle - startRotation.current.angle
         currentRotation.current = startRotation.current.rotation + angleDiff
 
@@ -362,7 +361,7 @@ export const Drager: React.FC<DragerProps> = ({
         if (content) {
           content.style.willChange = ''
         }
-        // 清除辅助线
+        // clear guides
         if (canvas && ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
         }
@@ -414,7 +413,6 @@ export const Drager: React.FC<DragerProps> = ({
           const anchorPos = getAnchorPosition(targetRect, targetPosition)
           const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
 
-          // 如果在吸附范围内，创建连接
           if (distance < 20) {
             const connectionManager = ConnectionManager.getInstance()
             connectionManager.addConnection({
@@ -428,7 +426,7 @@ export const Drager: React.FC<DragerProps> = ({
         }
       }
 
-      // 清理状态
+      // clean up state
       connectingAnchor.current = null
       document.querySelectorAll('.anchor').forEach((anchor) => {
         anchor.classList.remove('anchor-hover')
@@ -437,7 +435,7 @@ export const Drager: React.FC<DragerProps> = ({
       document.removeEventListener('mouseup', handleAnchorDragEnd)
     }
 
-    // 添加连接点事件监听
+    // add connection point event listener
     const anchors = content.querySelectorAll('.anchor')
     anchors.forEach((anchor) => {
       anchor.addEventListener('mousedown', (e) => {

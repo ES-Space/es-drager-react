@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.markdown-content {
+  @apply prose prose-blue max-w-none;
+}
+
+.markdown-content pre {
+  @apply bg-gray-800 text-white p-4 rounded-lg overflow-x-auto;
+}
+
+.markdown-content code {
+  @apply text-sm;
+}
+
+.markdown-content table {
+  @apply w-full;
+}
+
+.markdown-content th {
+  @apply bg-gray-100 p-2 text-left;
+}
+
+.markdown-content td {
+  @apply border-t p-2;
+}
