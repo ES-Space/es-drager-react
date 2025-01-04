@@ -63,21 +63,31 @@ export function drawTempConnection(
   start: { x: number, y: number },
   end: { x: number, y: number },
 ) {
-  const offsetX = Math.abs(end.x - start.x) * 0.5
+  const dpr = window.devicePixelRatio || 1
+  const startPos = {
+    x: Math.round(start.x * dpr) / dpr,
+    y: Math.round(start.y * dpr) / dpr,
+  }
+  const endPos = {
+    x: Math.round(end.x * dpr) / dpr,
+    y: Math.round(end.y * dpr) / dpr,
+  }
+
+  const offsetX = Math.abs(endPos.x - startPos.x) * 0.5
 
   ctx.beginPath()
   ctx.strokeStyle = '#3b82f6'
   ctx.lineWidth = 2
   ctx.setLineDash([5, 5])
 
-  ctx.moveTo(start.x, start.y)
+  ctx.moveTo(startPos.x, startPos.y)
   ctx.bezierCurveTo(
-    start.x + offsetX,
-    start.y,
-    end.x - offsetX,
-    end.y,
-    end.x,
-    end.y,
+    startPos.x + offsetX,
+    startPos.y,
+    endPos.x - offsetX,
+    endPos.y,
+    endPos.x,
+    endPos.y,
   )
 
   ctx.stroke()
@@ -85,11 +95,27 @@ export function drawTempConnection(
 }
 
 export function getAnchorPosition(rect: DOMRect, position: AnchorPosition) {
-  const positions = {
-    top: { x: rect.left + rect.width / 2, y: rect.top },
-    right: { x: rect.right, y: rect.top + rect.height / 2 },
-    bottom: { x: rect.left + rect.width / 2, y: rect.bottom },
-    left: { x: rect.left, y: rect.top + rect.height / 2 },
+  const dpr = window.devicePixelRatio || 1
+  switch (position) {
+    case 'top':
+      return {
+        x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
+        y: Math.round(rect.top * dpr) / dpr,
+      }
+    case 'right':
+      return {
+        x: Math.round(rect.right * dpr) / dpr,
+        y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+      }
+    case 'bottom':
+      return {
+        x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
+        y: Math.round(rect.bottom * dpr) / dpr,
+      }
+    case 'left':
+      return {
+        x: Math.round(rect.left * dpr) / dpr,
+        y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+      }
   }
-  return positions[position]
 }

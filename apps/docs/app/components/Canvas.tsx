@@ -143,9 +143,10 @@ export function Canvas() {
             <h3 className="text-sm font-medium mb-4">With Snapping</h3>
             <div className="h-[200px] relative border rounded-lg">
               <Drager
+                id="snap1"
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                 snapToElements
-                snapThreshold={10}
+                snapThreshold={5}
               >
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-xs font-medium">Snap Box 1</div>
@@ -153,10 +154,11 @@ export function Canvas() {
                 </div>
               </Drager>
               <Drager
+                id="snap2"
                 className="w-32 h-32 border-2 border-dashed border-green-500 cursor-move flex items-center justify-center text-green-500"
-                style={{ left: '200px' }}
+                style={{ left: '180px' }}
                 snapToElements
-                snapThreshold={10}
+                snapThreshold={5}
               >
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-xs font-medium">Snap Box 2</div>
@@ -237,10 +239,10 @@ function getAnchorPosition(dragerId: string, anchor: string) {
 
   const rect = el.getBoundingClientRect()
   const positions = {
-    top: { x: rect.left + rect.width / 2, y: rect.top },
-    right: { x: rect.right, y: rect.top + rect.height / 2 },
-    bottom: { x: rect.left + rect.width / 2, y: rect.bottom },
-    left: { x: rect.left, y: rect.top + rect.height / 2 },
+    top: { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top) },
+    right: { x: Math.round(rect.right), y: Math.round(rect.top + rect.height / 2) },
+    bottom: { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.bottom) },
+    left: { x: Math.round(rect.left), y: Math.round(rect.top + rect.height / 2) },
   }
 
   return positions[anchor as keyof typeof positions]

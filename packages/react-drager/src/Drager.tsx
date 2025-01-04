@@ -50,6 +50,16 @@ export const Drager: React.FC<DragerProps> = ({
     if (!ctx || !contentRef.current)
       return
 
+    const dpr = window.devicePixelRatio || 1
+    // 设置 canvas 尺寸
+    canvasRef.current.style.width = `${window.innerWidth}px`
+    canvasRef.current.style.height = `${window.innerHeight}px`
+    canvasRef.current.width = window.innerWidth * dpr
+    canvasRef.current.height = window.innerHeight * dpr
+
+    // 应用 DPR 缩放
+    ctx.scale(dpr, dpr)
+
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
     const elements = document.elementsFromPoint(e.clientX, e.clientY)
@@ -225,7 +235,7 @@ export const Drager: React.FC<DragerProps> = ({
       }
 
       // 绘制所有连接
-      connectionManager.drawConnections(ctx)
+      connectionManager.drawConnections()
 
       if (connectingAnchor.current) {
         // 绘制正在创建的连接

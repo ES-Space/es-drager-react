@@ -3,8 +3,11 @@ import type { Connection } from './types'
 export class ConnectionManager {
   private static instance: ConnectionManager
   private connections: Connection[] = []
+  private canvas!: HTMLCanvasElement
 
-  private constructor() {}
+  private constructor() {
+    this.initCanvas()
+  }
 
   static getInstance() {
     if (!this.instance) {
@@ -27,7 +30,14 @@ export class ConnectionManager {
     return this.connections
   }
 
-  drawConnections(ctx: CanvasRenderingContext2D) {
+  drawConnections() {
+    const ctx = this.canvas.getContext('2d')
+    if (!ctx)
+      return
+
+    // 清除之前的绘制内容
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
     this.connections.forEach((conn) => {
       const sourceEl = document.querySelector(`[data-drager-id="${conn.sourceId}"]`)
       const targetEl = document.querySelector(`[data-drager-id="${conn.targetId}"]`)
@@ -46,15 +56,28 @@ export class ConnectionManager {
   }
 
   private getAnchorPosition(rect: DOMRect, anchor: string) {
+    const dpr = window.devicePixelRatio || 1
     switch (anchor) {
       case 'top':
-        return { x: rect.left + rect.width / 2, y: rect.top }
+        return {
+          x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
+          y: Math.round(rect.top * dpr) / dpr,
+        }
       case 'right':
-        return { x: rect.right, y: rect.top + rect.height / 2 }
+        return {
+          x: Math.round(rect.right * dpr) / dpr,
+          y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+        }
       case 'bottom':
-        return { x: rect.left + rect.width / 2, y: rect.bottom }
+        return {
+          x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
+          y: Math.round(rect.bottom * dpr) / dpr,
+        }
       case 'left':
-        return { x: rect.left, y: rect.top + rect.height / 2 }
+        return {
+          x: Math.round(rect.left * dpr) / dpr,
+          y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+        }
       default:
         return { x: 0, y: 0 }
     }
@@ -70,20 +93,45 @@ export class ConnectionManager {
     ctx.beginPath()
     ctx.strokeStyle = '#3b82f6'
     ctx.lineWidth = 2
+    ctx.setLineDash([5, 5])
 
-    // 移动到起点
     ctx.moveTo(start.x, start.y)
-
-    // 绘制贝塞尔曲线
     ctx.bezierCurveTo(
       start.x + offsetX,
-      start.y, // 控制点1
+      start.y,
       end.x - offsetX,
-      end.y, // 控制点2
+      end.y,
       end.x,
-      end.y, // 终点
+      end.y,
     )
 
     ctx.stroke()
+    ctx.setLineDash([])
+  }
+
+  private initCanvas() {
+    this.canvas = document.createElement('canvas')
+    this.canvas.style.position = 'fixed'
+    this.canvas.style.top = '0'
+    this.canvas.style.left = '0'
+    this.canvas.style.pointerEvents = 'none'
+    this.canvas.style.zIndex = '1000'
+
+    const dpr = window.devicePixelRatio || 1
+    const updateCanvasSize = () => {
+      this.canvas.style.width = `${window.innerWidth}px`
+      this.canvas.style.height = `${window.innerHeight}px`
+      this.canvas.width = window.innerWidth * dpr
+      this.canvas.height = window.innerHeight * dpr
+
+      const ctx = this.canvas.getContext('2d')
+      if (ctx) {
+        ctx.scale(dpr, dpr)
+      }
+    }
+
+    updateCanvasSize()
+    window.addEventListener('resize', updateCanvasSize)
+    document.body.appendChild(this.canvas)
   }
 }
