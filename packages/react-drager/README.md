@@ -16,7 +16,6 @@
 - 🔗 Connection points with bezier curves
 - 📏 Snap to grid & alignment guides
 - 🎨 Tailwind CSS styling
-- 📦 Tiny bundle size (~5KB)
 - 🎮 Rich interaction events
 
 ## 📦 Installation

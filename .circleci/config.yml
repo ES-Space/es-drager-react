@@ -36,6 +36,9 @@ jobs:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
+          name: Update version
+          command: cd packages/react-drager && npm version patch
+      - run:
           name: Publish package
           command: cd packages/react-drager && npm publish --access public
 
