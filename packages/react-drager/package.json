@@ -1,7 +1,7 @@
 {
   "name": "@es-space/es-drager-react",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A React component for dragging, rotating and scaling",
   "homepage": "https://es-space.github.io/es-drager-react",
   "repository": {
