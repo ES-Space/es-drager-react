@@ -25,6 +25,7 @@ jobs:
           paths:
             - packages/react-drager/dist
             - packages/react-drager/package.json
+            - packages/react-drager/README.md
 
   publish-npm:
     executor: node/default
