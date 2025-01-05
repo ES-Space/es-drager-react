@@ -134,4 +134,4 @@ bun build
 
 ## 📄 License
 
-[MIT](./LICENSE)
+ES Drager is open source software licensed as [MIT](https://github.com/ES-Space/es-drager-react/blob/main/LICENSE).

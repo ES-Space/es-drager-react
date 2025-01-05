@@ -8,6 +8,14 @@
     "type": "git",
     "url": "git+https://github.com/ES-Space/es-drager-react.git"
   },
+  "keywords": [
+    "react",
+    "draggable",
+    "rotatable",
+    "scalable",
+    "drag-and-drop",
+    "connection"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
