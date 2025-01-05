@@ -29,6 +29,10 @@ jobs:
       - name: Install dependencies
         run: bun install
       
+      - name: Build packages
+        run: |
+          bun run build --filter="@es-space/es-drager-react"
+      
       - name: Build docs
         run: |
           cd apps/docs
