@@ -10,11 +10,11 @@ interface Connection {
   targetAnchor: string
 }
 
-export function Canvas() {
+export function Examples() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [bounds, setBounds] = useState({
-    maxX: window.innerWidth, // 默认宽度
-    maxY: window.innerHeight, // 默认高度
+    maxX: 0,
+    maxY: 0,
   })
   const [_, setConnections] = useState<Connection[]>([])
   const [dragers] = useState([
@@ -22,6 +22,13 @@ export function Canvas() {
     { id: 'drager-2', label: 'Drager 2', x: 300, y: 20 },
     { id: 'drager-3', label: 'Drager 3', x: 500, y: 20 },
   ])
+
+  useEffect(() => {
+    setBounds({
+      maxX: window.innerWidth,
+      maxY: window.innerHeight,
+    })
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current)
@@ -179,9 +186,9 @@ export function Canvas() {
             Hover over the blue dots and drag to another dot to create a connection
           </div>
           <div className="h-[200px] relative border rounded-lg">
-            {dragers.map(drager => (
+            {dragers.map((drager, idx) => (
               <Drager
-                key={drager.id}
+                key={idx}
                 id={drager.id}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
                 connectable

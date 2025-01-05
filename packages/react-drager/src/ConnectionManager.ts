@@ -115,7 +115,7 @@ export class ConnectionManager {
     this.canvas.style.top = '0'
     this.canvas.style.left = '0'
     this.canvas.style.pointerEvents = 'none'
-    this.canvas.style.zIndex = '1000'
+    this.canvas.style.zIndex = '9999'
 
     const dpr = window.devicePixelRatio || 1
     const updateCanvasSize = () => {

@@ -5,11 +5,9 @@ import { Anchor } from './components/Anchor'
 import { ConnectionManager } from './ConnectionManager'
 import { drawTempConnection, getAnchorPosition, getDragerElements, getSnapPosition } from './utils'
 
-// generate unique id
-const generateUniqueId = () => `drager-${Math.random().toString(36).slice(2, 11)}`
-
 export const Drager: React.FC<DragerProps> = ({
-  id = generateUniqueId(),
+  id,
+  connectable = false,
   children,
   className,
   style,
@@ -21,8 +19,7 @@ export const Drager: React.FC<DragerProps> = ({
   maxScale = 2,
   showGuides = false,
   snapThreshold = 5,
-  snapToElements = true,
-  connectable = false,
+  snapToElements = false,
   onConnect,
   onDragStart,
   onDragEnd,
@@ -30,6 +27,10 @@ export const Drager: React.FC<DragerProps> = ({
   onRotate,
   onScale,
 }) => {
+  if (connectable && !id) {
+    throw new Error('id prop is required when connectable is true')
+  }
+
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const rotateHandleRef = useRef<HTMLDivElement>(null)

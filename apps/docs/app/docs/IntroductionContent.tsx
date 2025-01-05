@@ -41,8 +41,6 @@ export function IntroductionContent() {
             id="node-1"
             className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
             style={{ left: '200px' }}
-            rotatable
-            scalable
             connectable
           >
             Connections
@@ -58,20 +56,6 @@ export function IntroductionContent() {
             Try me!
           </Drager>
         </InfiniteCanvas>
-      </div>
-
-      <div className="text-sm text-gray-500 mt-2">
-        <p>
-          Tips:
-          {' '}
-          <span className="font-medium">Middle mouse button</span>
-          {' '}
-          to pan canvas,
-          {' '}
-          <span className="font-medium">Ctrl + Scroll</span>
-          {' '}
-          to zoom
-        </p>
       </div>
 
       <h2>Quick Example</h2>

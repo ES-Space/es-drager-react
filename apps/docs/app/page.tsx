@@ -1,4 +1,4 @@
-import { Canvas } from './components/Canvas'
+import { Examples } from './components/Examples'
 import { Header } from './components/Header'
 
 export default function Page() {
@@ -8,7 +8,7 @@ export default function Page() {
         <Header />
       </div>
       <div className="flex-1">
-        <Canvas />
+        <Examples />
       </div>
     </div>
   )
