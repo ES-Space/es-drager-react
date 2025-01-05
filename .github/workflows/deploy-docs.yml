@@ -38,6 +38,8 @@ jobs:
           cd apps/docs
           bun run build
           touch out/.nojekyll
+        env:
+          NODE_ENV: production
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
