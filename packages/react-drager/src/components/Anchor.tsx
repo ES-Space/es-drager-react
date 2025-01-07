@@ -16,7 +16,7 @@ export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart }) => {
         height: '8px',
         backgroundColor: '#3b82f6',
         borderRadius: '50%',
-        cursor: 'pointer',
+        cursor: 'crosshair',
         ...getAnchorStyle(position),
       }}
       onMouseDown={() => onDragStart(position)}

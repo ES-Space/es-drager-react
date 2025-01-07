@@ -1,9 +1,10 @@
 import type { AnchorPosition, DragerProps } from './types'
 import { RotateCw } from 'lucide-react'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Anchor } from './components/Anchor'
 import { ConnectionManager } from './ConnectionManager'
-import { drawTempConnection, getAnchorPosition, getDragerElements, getSnapPosition } from './utils'
+import { GuidelineManager } from './GuidelineManager'
+import { getAnchorPosition, getDragerElements, getSnapPosition } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
   id,
@@ -31,7 +32,6 @@ export const Drager: React.FC<DragerProps> = ({
     throw new Error('id prop is required when connectable is true')
   }
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const rotateHandleRef = useRef<HTMLDivElement>(null)
   const startPos = useRef({ x: 0, y: 0 })
@@ -46,66 +46,38 @@ export const Drager: React.FC<DragerProps> = ({
   const connectingAnchor = useRef<AnchorPosition | null>(null)
   const currentMousePos = useRef({ x: 0, y: 0 })
   const startRotation = useRef({ angle: 0, rotation: 0 })
+  const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null)
+  const animationFrameId = useRef<number | null>(null)
 
   const handleAnchorDrag = (e: MouseEvent) => {
-    if (!canvasRef.current)
-      return
-    const ctx = canvasRef.current.getContext('2d')
-    if (!ctx || !contentRef.current)
-      return
-
-    const dpr = window.devicePixelRatio || 1
-    canvasRef.current.style.width = `${window.innerWidth}px`
-    canvasRef.current.style.height = `${window.innerHeight}px`
-    canvasRef.current.width = window.innerWidth * dpr
-    canvasRef.current.height = window.innerHeight * dpr
-
-    // fix dpr
-    ctx.scale(dpr, dpr)
-
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-
     const elements = document.elementsFromPoint(e.clientX, e.clientY)
     const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
     const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
 
-    const sourceRect = contentRef.current.getBoundingClientRect()
-    const sourcePos = getAnchorPosition(sourceRect, connectingAnchor.current!)
+    // 添加临时连接线的绘制
+    if (contentRef.current && connectingAnchor.current) {
+      const rect = contentRef.current.getBoundingClientRect()
+      const startPos = getAnchorPosition(rect, connectingAnchor.current)
+      const endPos = { x: e.clientX, y: e.clientY }
+      ConnectionManager.getInstance().drawTempConnection(startPos, endPos)
+    }
 
-    let endPos = { x: e.clientX, y: e.clientY }
-    let isSnapped = false
+    document.querySelectorAll('.anchor').forEach((anchor) => {
+      anchor.classList.remove('anchor-hover')
+    })
 
-    // check if near target anchor
     if (targetAnchor && targetDrager) {
       const targetId = targetDrager.getAttribute('data-drager-id')
       if (targetId !== id) {
-        const targetRect = targetDrager.getBoundingClientRect()
-        const targetPosition = targetAnchor.getAttribute('data-position') as AnchorPosition
-        const anchorPos = getAnchorPosition(targetRect, targetPosition)
-
-        // calculate distance between mouse and anchor
-        const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
-
-        // if distance less than 20px, snap to anchor
+        const distance = Math.hypot(
+          e.clientX - targetAnchor.getBoundingClientRect().left,
+          e.clientY - targetAnchor.getBoundingClientRect().top,
+        )
         if (distance < 20) {
-          endPos = anchorPos
-          isSnapped = true
-          targetAnchor.classList.add('anchor-hover') // optional: add visual feedback
-        }
-        else {
-          targetAnchor.classList.remove('anchor-hover')
+          targetAnchor.classList.add('anchor-hover')
         }
       }
     }
-
-    // if not snapped, remove all anchor hover effect
-    if (!isSnapped) {
-      document.querySelectorAll('.anchor').forEach((anchor) => {
-        anchor.classList.remove('anchor-hover')
-      })
-    }
-
-    drawTempConnection(ctx, sourcePos, endPos)
   }
 
   const handleAnchorDragEnd = (e: MouseEvent) => {
@@ -116,6 +88,8 @@ export const Drager: React.FC<DragerProps> = ({
     const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
     const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
 
+    let connectionCreated = false
+
     if (targetAnchor && targetDrager) {
       const targetId = targetDrager.getAttribute('data-drager-id')
       const targetPosition = targetAnchor.getAttribute('data-position') as AnchorPosition
@@ -125,7 +99,6 @@ export const Drager: React.FC<DragerProps> = ({
         const anchorPos = getAnchorPosition(targetRect, targetPosition)
         const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
 
-        // if in snap range, create connection
         if (distance < 20) {
           const connectionManager = ConnectionManager.getInstance()
           connectionManager.addConnection({
@@ -135,8 +108,14 @@ export const Drager: React.FC<DragerProps> = ({
             targetAnchor: targetPosition,
           })
           onConnect?.(id, connectingAnchor.current, targetId, targetPosition)
+          connectionCreated = true
         }
       }
+    }
+
+    // 如果没有创建连接，移除临时连接线
+    if (!connectionCreated) {
+      ConnectionManager.getInstance().removeTempConnection()
     }
 
     // clean up state
@@ -154,26 +133,36 @@ export const Drager: React.FC<DragerProps> = ({
     document.addEventListener('mouseup', handleAnchorDragEnd)
   }
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const content = contentRef.current
-    const rotateHandle = rotateHandleRef.current
-    if (!canvas || !content)
+  const handleAnchorMouseDown = (position: AnchorPosition) => (e: MouseEvent) => {
+    e.stopPropagation()
+    if (!contentRef.current)
       return
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx)
-      return
+    connectingAnchor.current = position
+    const rect = contentRef.current.getBoundingClientRect()
+    const startPos = getAnchorPosition(rect, position)
+    setMousePos(startPos) // 设置初始位置
 
-    const updateCanvasSize = () => {
-      if (!canvas)
-        return
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY })
     }
 
-    updateCanvasSize()
-    window.addEventListener('resize', updateCanvasSize)
+    const handleMouseUp = (e: MouseEvent) => {
+      handleAnchorDragEnd(e)
+      setMousePos(null) // 清除鼠标位置
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  useEffect(() => {
+    const content = contentRef.current
+    const rotateHandle = rotateHandleRef.current
+    if (!content)
+      return
 
     const limitPosition = (pos: { x: number, y: number }) => {
       if (!limit)
@@ -189,62 +178,37 @@ export const Drager: React.FC<DragerProps> = ({
     }
 
     const drawGuides = () => {
-      if (!canvas || !ctx || !content || !isDragging.current || !showGuides)
+      if (!content || !isDragging.current || !showGuides)
         return
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.strokeStyle = '#ccc'
-      ctx.lineWidth = 1
-      ctx.setLineDash([4, 4])
 
       const rect = content.getBoundingClientRect()
+      const guidelineManager = GuidelineManager.getInstance()
 
-      // left
-      ctx.beginPath()
-      ctx.moveTo(rect.left, 0)
-      ctx.lineTo(rect.left, canvas.height)
-      ctx.stroke()
-
-      // right
-      ctx.beginPath()
-      ctx.moveTo(rect.right, 0)
-      ctx.lineTo(rect.right, canvas.height)
-      ctx.stroke()
-
-      // top
-      ctx.beginPath()
-      ctx.moveTo(0, rect.top)
-      ctx.lineTo(canvas.width, rect.top)
-      ctx.stroke()
-
-      // bottom
-      ctx.beginPath()
-      ctx.moveTo(0, rect.bottom)
-      ctx.lineTo(canvas.width, rect.bottom)
-      ctx.stroke()
+      guidelineManager.clear()
+      guidelineManager.drawGuidelines({
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      })
     }
 
-    const connectionManager = ConnectionManager.getInstance()
-
     const draw = () => {
-      if (!ctx)
-        return
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
       if (isDragging.current && showGuides) {
         drawGuides()
       }
 
-      connectionManager.drawConnections()
-
-      if (connectingAnchor.current) {
-        const sourceRect = content.getBoundingClientRect()
-        const sourcePos = getAnchorPosition(sourceRect, connectingAnchor.current)
-        drawTempConnection(ctx, sourcePos, { x: currentMousePos.current.x, y: currentMousePos.current.y })
+      // 如果有鼠标位置和起始锚点，绘制临时连接线
+      if (mousePos && connectingAnchor.current && content) {
+        const rect = content.getBoundingClientRect()
+        const startPos = getAnchorPosition(rect, connectingAnchor.current)
+        const connectionManager = ConnectionManager.getInstance()
+        connectionManager.drawTempConnection(startPos, mousePos)
       }
 
-      requestAnimationFrame(draw)
+      animationFrameId.current = requestAnimationFrame(draw)
     }
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -296,6 +260,7 @@ export const Drager: React.FC<DragerProps> = ({
         requestAnimationFrame(() => {
           updateTransform()
           onRotate?.(currentRotation.current)
+          ConnectionManager.getInstance().updateConnections()
         })
         return
       }
@@ -336,6 +301,7 @@ export const Drager: React.FC<DragerProps> = ({
         requestAnimationFrame(() => {
           updateTransform()
           onDrag?.(currentPos.current)
+          ConnectionManager.getInstance().updateConnections()
         })
       }
 
@@ -352,6 +318,11 @@ export const Drager: React.FC<DragerProps> = ({
         const angleDiff = currentAngle - startRotation.current.angle
         currentRotation.current = startRotation.current.rotation + angleDiff
         onRotate?.(currentRotation.current)
+        requestAnimationFrame(() => {
+          updateTransform()
+          onRotate?.(currentRotation.current)
+          ConnectionManager.getInstance().updateConnections()
+        })
       }
     }
 
@@ -362,10 +333,9 @@ export const Drager: React.FC<DragerProps> = ({
         if (content) {
           content.style.willChange = ''
         }
-        // clear guides
-        if (canvas && ctx) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-        }
+        // 清除辅助线
+        const guidelineManager = GuidelineManager.getInstance()
+        guidelineManager.clear()
       }
       if (isRotating.current) {
         isRotating.current = false
@@ -384,6 +354,7 @@ export const Drager: React.FC<DragerProps> = ({
       currentScale.current = newScale
       updateTransform()
       onScale?.(newScale)
+      ConnectionManager.getInstance().updateConnections()
     }
 
     content.addEventListener('mousedown', handleMouseDown)
@@ -405,6 +376,8 @@ export const Drager: React.FC<DragerProps> = ({
       const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
       const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
 
+      let connectionCreated = false
+
       if (targetAnchor && targetDrager) {
         const targetId = targetDrager.getAttribute('data-drager-id')
         const targetPosition = targetAnchor.getAttribute('data-position') as AnchorPosition
@@ -423,8 +396,14 @@ export const Drager: React.FC<DragerProps> = ({
               targetAnchor: targetPosition,
             })
             onConnect?.(id, connectingAnchor.current, targetId, targetPosition)
+            connectionCreated = true
           }
         }
+      }
+
+      // 如果没有创建连接，移除临时连接线
+      if (!connectionCreated) {
+        ConnectionManager.getInstance().removeTempConnection()
       }
 
       // clean up state
@@ -439,15 +418,11 @@ export const Drager: React.FC<DragerProps> = ({
     // add connection point event listener
     const anchors = content.querySelectorAll('.anchor')
     anchors.forEach((anchor) => {
-      anchor.addEventListener('mousedown', (e) => {
-        e.stopPropagation()
-        const position = anchor.getAttribute('data-position') as AnchorPosition
-        handleAnchorDragStart(position)
-      })
+      const position = anchor.getAttribute('data-position') as AnchorPosition
+      anchor.addEventListener('mousedown', (e: Event) => handleAnchorMouseDown(position)(e as MouseEvent))
     })
 
     return () => {
-      window.removeEventListener('resize', updateCanvasSize)
       content.removeEventListener('mousedown', handleMouseDown)
       if (rotatable && rotateHandle) {
         rotateHandle.removeEventListener('mousedown', handleRotateStart)
@@ -459,66 +434,56 @@ export const Drager: React.FC<DragerProps> = ({
       }
       document.removeEventListener('mousemove', handleAnchorDrag)
       document.removeEventListener('mouseup', handleAnchorDragEnd)
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current)
+      }
     }
-  }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, onConnect])
+  }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, onConnect, mousePos])
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          pointerEvents: 'none',
-          zIndex: 1000,
-        }}
-      />
-      <div
-        ref={contentRef}
-        data-drager
-        data-drager-id={id}
-        className={className}
-        style={{
-          position: 'absolute',
-          userSelect: 'none',
-          cursor: 'move',
-          transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
-        }}
-      >
-        {connectable && (
-          <>
-            <Anchor position="top" onDragStart={handleAnchorDragStart} />
-            <Anchor position="right" onDragStart={handleAnchorDragStart} />
-            <Anchor position="bottom" onDragStart={handleAnchorDragStart} />
-            <Anchor position="left" onDragStart={handleAnchorDragStart} />
-          </>
-        )}
-        {children}
-        {rotatable && (
-          <div
-            ref={rotateHandleRef}
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '-32px',
-              transform: `translateX(-50%) rotate(${-currentRotation.current}deg)`,
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              width: '16px',
-              height: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            className="hover:scale-110"
-          >
-            <RotateCw className="w-4 h-4 text-blue-500" />
-          </div>
-        )}
-      </div>
-    </>
+    <div
+      ref={contentRef}
+      data-drager
+      data-drager-id={id}
+      className={className}
+      style={{
+        position: 'absolute',
+        userSelect: 'none',
+        cursor: 'move',
+        transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
+        ...style,
+      }}
+    >
+      {connectable && (
+        <>
+          <Anchor position="top" onDragStart={handleAnchorDragStart} />
+          <Anchor position="right" onDragStart={handleAnchorDragStart} />
+          <Anchor position="bottom" onDragStart={handleAnchorDragStart} />
+          <Anchor position="left" onDragStart={handleAnchorDragStart} />
+        </>
+      )}
+      {children}
+      {rotatable && (
+        <div
+          ref={rotateHandleRef}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '-32px',
+            transform: `translateX(-50%) rotate(${-currentRotation.current}deg)`,
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+            width: '16px',
+            height: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          className="hover:scale-110"
+        >
+          <RotateCw className="w-4 h-4 text-blue-500" />
+        </div>
+      )}
+    </div>
   )
 }

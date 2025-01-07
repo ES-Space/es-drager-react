@@ -68,8 +68,12 @@ export function Examples() {
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">Basic Usage</h3>
             <div className="h-[200px] relative border rounded-lg">
-              <Drager className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500">
-                Drag me
+              <Drager
+                className="w-32 h-32 border-2 border-dashed border-blue-500"
+              >
+                <div className="flex items-center justify-center h-full text-blue-500">
+                  Drag me
+                </div>
               </Drager>
             </div>
           </div>
@@ -155,24 +159,28 @@ export function Examples() {
             <h3 className="text-sm font-medium mb-4">With Snapping</h3>
             <div className="h-[200px] relative border rounded-lg">
               <Drager
-                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
+                className="w-32 h-32 border-2 border-dashed border-blue-500"
                 snapToElements
                 snapThreshold={5}
+
               >
-                <div className="flex flex-col items-center gap-1">
-                  <div className="text-xs font-medium">Snap Box 1</div>
+                <div className="flex flex-col items-center justify-center h-full gap-1">
+                  <div className="text-xs font-medium text-blue-500">Snap Box 1</div>
                   <div className="text-[10px] text-gray-400">Try dragging me</div>
                 </div>
               </Drager>
 
               <Drager
-                className="w-32 h-32 border-2 border-dashed border-green-500 cursor-move flex items-center justify-center text-green-500"
-                style={{ left: '200px' }}
+                className="w-32 h-32 border-2 border-dashed border-green-500"
                 snapToElements
                 snapThreshold={5}
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                }}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <div className="text-xs font-medium">Snap Box 2</div>
+                <div className="flex flex-col items-center justify-center h-full gap-1">
+                  <div className="text-xs font-medium text-green-500">Snap Box 2</div>
                   <div className="text-[10px] text-gray-400">Try dragging me</div>
                 </div>
               </Drager>
@@ -190,22 +198,21 @@ export function Examples() {
               <Drager
                 key={idx}
                 id={drager.id}
-                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move"
+                className="w-32 h-32 border-2 border-dashed border-blue-500"
                 connectable
                 onConnect={handleConnect}
                 style={{
                   position: 'absolute',
-                  left: drager.x,
-                  top: drager.y,
+                  left: drager.x - 100,
+                  top: drager.y - 10,
                 }}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <div className="text-xs font-medium">{drager.label}</div>
+                <div className="flex flex-col items-center justify-center h-full gap-1">
+                  <div className="text-xs font-medium text-blue-500">{drager.label}</div>
                   <div className="text-[10px] text-gray-400">Connect me!</div>
                 </div>
               </Drager>
             ))}
-
           </div>
         </div>
       </div>

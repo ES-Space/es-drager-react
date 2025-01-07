@@ -1,6 +1,7 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { BASE_PATH } from '../../env'
 import { InfiniteCanvas } from '../components/InfiniteCanvas'
 
 export function IntroductionContent() {
@@ -32,6 +33,7 @@ export function IntroductionContent() {
         <InfiniteCanvas>
           <Drager
             className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{ left: '50px', top: '20px' }}
             rotatable
             scalable
           >
@@ -40,7 +42,7 @@ export function IntroductionContent() {
           <Drager
             id="node-1"
             className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '200px' }}
+            style={{ left: '150px', top: '20px' }}
             connectable
           >
             Connections
@@ -48,7 +50,7 @@ export function IntroductionContent() {
           <Drager
             id="node-2"
             className="w-32 h-32 bg-purple-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '400px' }}
+            style={{ left: '250px', top: '20px' }}
             rotatable
             scalable
             connectable
@@ -85,21 +87,21 @@ function App() {
         <li>
           Check out the
           {' '}
-          <a href="/docs/installation">Installation</a>
+          <a href={`${BASE_PATH}/docs/installation`}>Installation</a>
           {' '}
           guide to get started
         </li>
         <li>
           Learn about basic
           {' '}
-          <a href="/docs/dragging">dragging</a>
+          <a href={`${BASE_PATH}/docs/dragging`}>dragging</a>
           {' '}
           functionality
         </li>
         <li>
           Explore advanced features like
           {' '}
-          <a href="/docs/connections">connections</a>
+          <a href={`${BASE_PATH}/docs/connections`}>connections</a>
         </li>
       </ul>
     </div>

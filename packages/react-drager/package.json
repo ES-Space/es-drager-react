@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.0.8",
   "description": "A React component for dragging, rotating and scaling",
+  "license": "MIT",
   "homepage": "https://es-space.github.io/es-drager-react",
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
+    "LICENSE",
     "README.md",
     "dist"
   ],

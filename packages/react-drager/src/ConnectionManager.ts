@@ -3,10 +3,23 @@ import type { Connection } from './types'
 export class ConnectionManager {
   private static instance: ConnectionManager
   private connections: Connection[] = []
-  private canvas!: HTMLCanvasElement
+  private svg: SVGSVGElement
+  private selectedConnection: Connection | null = null
 
   private constructor() {
-    this.initCanvas()
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    this.initSVG()
+    this.initEventListeners()
+
+    // 添加窗口大小变化和滚动监听
+    window.addEventListener('resize', () => {
+      this.updateConnections()
+    })
+
+    // 监听滚动事件
+    window.addEventListener('scroll', () => {
+      this.updateConnections()
+    }, true) // 使用捕获阶段以确保能捕获到所有滚动事件
   }
 
   static getInstance() {
@@ -16,14 +29,53 @@ export class ConnectionManager {
     return this.instance
   }
 
-  addConnection(connection: Connection) {
-    this.connections.push(connection)
+  private initSVG() {
+    this.svg.style.position = 'fixed'
+    this.svg.style.top = '0'
+    this.svg.style.left = '0'
+    this.svg.style.width = '100%'
+    this.svg.style.height = '100%'
+    this.svg.style.pointerEvents = 'none'
+    this.svg.style.zIndex = '9999'
+    document.body.appendChild(this.svg)
   }
 
-  removeConnection(sourceId: string, targetId: string) {
-    this.connections = this.connections.filter(
-      conn => !(conn.sourceId === sourceId && conn.targetId === targetId),
-    )
+  private initEventListeners() {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.selectedConnection) {
+        this.selectedConnection = null
+        this.drawConnections()
+      }
+      else if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedConnection) {
+        this.removeConnection()
+      }
+    })
+
+    this.svg.addEventListener('click', (e) => {
+      if (e.target === this.svg) {
+        this.selectedConnection = null
+        this.drawConnections()
+      }
+    })
+  }
+
+  addConnection(connection: Connection) {
+    this.connections.push(connection)
+    this.drawConnections()
+  }
+
+  removeConnection() {
+    this.connections = this.connections.filter((conn) => {
+      if (!this.selectedConnection)
+        return true
+      return !(
+        conn.sourceId === this.selectedConnection.sourceId
+        && conn.targetId === this.selectedConnection.targetId
+        && conn.sourceAnchor === this.selectedConnection.sourceAnchor
+        && conn.targetAnchor === this.selectedConnection.targetAnchor
+      )
+    })
+    this.drawConnections()
   }
 
   getConnections() {
@@ -31,107 +83,122 @@ export class ConnectionManager {
   }
 
   drawConnections() {
-    const ctx = this.canvas.getContext('2d')
-    if (!ctx)
-      return
-
-    // 清除之前的绘制内容
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    while (this.svg.firstChild) {
+      this.svg.removeChild(this.svg.firstChild)
+    }
 
     this.connections.forEach((conn) => {
-      const sourceEl = document.querySelector(`[data-drager-id="${conn.sourceId}"]`)
-      const targetEl = document.querySelector(`[data-drager-id="${conn.targetId}"]`)
-
-      if (!sourceEl || !targetEl)
-        return
-
-      const sourceRect = sourceEl.getBoundingClientRect()
-      const targetRect = targetEl.getBoundingClientRect()
-
-      const sourcePos = this.getAnchorPosition(sourceRect, conn.sourceAnchor)
-      const targetPos = this.getAnchorPosition(targetRect, conn.targetAnchor)
-
-      this.drawBezierConnection(ctx, sourcePos, targetPos)
+      const pathElement = this.getPathElement(conn)
+      if (pathElement) {
+        this.svg.appendChild(pathElement)
+      }
     })
   }
 
+  drawTempConnection(start: { x: number, y: number }, end: { x: number, y: number }) {
+    const tempLine = document.getElementById('temp-connection')
+    if (tempLine) {
+      this.svg.removeChild(tempLine)
+    }
+
+    const path = this.createConnectionPath(start, end)
+    path.id = 'temp-connection'
+    path.style.strokeDasharray = '5,5'
+    this.svg.appendChild(path)
+  }
+
   private getAnchorPosition(rect: DOMRect, anchor: string) {
-    const dpr = window.devicePixelRatio || 1
     switch (anchor) {
       case 'top':
         return {
-          x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
-          y: Math.round(rect.top * dpr) / dpr,
+          x: rect.left + rect.width / 2,
+          y: rect.top,
         }
       case 'right':
         return {
-          x: Math.round(rect.right * dpr) / dpr,
-          y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+          x: rect.right,
+          y: rect.top + rect.height / 2,
         }
       case 'bottom':
         return {
-          x: Math.round((rect.left + rect.width / 2) * dpr) / dpr,
-          y: Math.round(rect.bottom * dpr) / dpr,
+          x: rect.left + rect.width / 2,
+          y: rect.bottom,
         }
       case 'left':
         return {
-          x: Math.round(rect.left * dpr) / dpr,
-          y: Math.round((rect.top + rect.height / 2) * dpr) / dpr,
+          x: rect.left,
+          y: rect.top + rect.height / 2,
         }
       default:
         return { x: 0, y: 0 }
     }
   }
 
-  private drawBezierConnection(
-    ctx: CanvasRenderingContext2D,
-    start: { x: number, y: number },
-    end: { x: number, y: number },
-  ) {
-    const offsetX = Math.abs(end.x - start.x) * 0.5
+  private getPathElement(connection: Connection): SVGPathElement | null {
+    const sourceEl = document.querySelector(`[data-drager-id="${connection.sourceId}"]`)
+    const targetEl = document.querySelector(`[data-drager-id="${connection.targetId}"]`)
 
-    ctx.beginPath()
-    ctx.strokeStyle = '#3b82f6'
-    ctx.lineWidth = 2
-    ctx.setLineDash([5, 5])
+    if (!sourceEl || !targetEl)
+      return null
 
-    ctx.moveTo(start.x, start.y)
-    ctx.bezierCurveTo(
-      start.x + offsetX,
-      start.y,
-      end.x - offsetX,
-      end.y,
-      end.x,
-      end.y,
+    const sourceRect = sourceEl.getBoundingClientRect()
+    const targetRect = targetEl.getBoundingClientRect()
+
+    const sourcePos = this.getAnchorPosition(sourceRect, connection.sourceAnchor)
+    const targetPos = this.getAnchorPosition(targetRect, connection.targetAnchor)
+
+    const path = this.createConnectionPath(
+      sourcePos,
+      targetPos,
+      this.selectedConnection === connection,
     )
 
-    ctx.stroke()
-    ctx.setLineDash([])
+    // 添加点击事件
+    path.addEventListener('click', (e) => {
+      e.stopPropagation()
+      this.selectedConnection = connection
+      this.drawConnections()
+    })
+
+    return path
   }
 
-  private initCanvas() {
-    this.canvas = document.createElement('canvas')
-    this.canvas.style.position = 'fixed'
-    this.canvas.style.top = '0'
-    this.canvas.style.left = '0'
-    this.canvas.style.pointerEvents = 'none'
-    this.canvas.style.zIndex = '9999'
+  private createConnectionPath(start: { x: number, y: number }, end: { x: number, y: number }, isSelected = false) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+    const offsetX = Math.abs(end.x - start.x) * 0.5
 
-    const dpr = window.devicePixelRatio || 1
-    const updateCanvasSize = () => {
-      this.canvas.style.width = `${window.innerWidth}px`
-      this.canvas.style.height = `${window.innerHeight}px`
-      this.canvas.width = window.innerWidth * dpr
-      this.canvas.height = window.innerHeight * dpr
+    const d = `M ${start.x} ${start.y} 
+               C ${start.x + offsetX} ${start.y},
+                 ${end.x - offsetX} ${end.y},
+                 ${end.x} ${end.y}`
 
-      const ctx = this.canvas.getContext('2d')
-      if (ctx) {
-        ctx.scale(dpr, dpr)
-      }
+    path.setAttribute('d', d)
+    path.setAttribute('stroke', isSelected ? '#f59e0b' : '#3b82f6')
+    path.setAttribute('stroke-width', isSelected ? '3' : '2')
+    path.setAttribute('fill', 'none')
+    path.style.pointerEvents = 'stroke'
+    path.style.cursor = 'pointer'
+
+    return path
+  }
+
+  removeTempConnection() {
+    const tempLine = document.getElementById('temp-connection')
+    if (tempLine) {
+      this.svg.removeChild(tempLine)
     }
+  }
 
-    updateCanvasSize()
-    window.addEventListener('resize', updateCanvasSize)
-    document.body.appendChild(this.canvas)
+  updateConnections() {
+    this.drawConnections() // 重新绘制所有连接
+  }
+
+  // 添加清理方法
+  destroy() {
+    window.removeEventListener('resize', this.updateConnections)
+    window.removeEventListener('scroll', this.updateConnections, true)
+    if (this.svg.parentNode) {
+      this.svg.parentNode.removeChild(this.svg)
+    }
   }
 }

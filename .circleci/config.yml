@@ -26,6 +26,7 @@ jobs:
             - packages/react-drager/dist
             - packages/react-drager/package.json
             - packages/react-drager/README.md
+            - packages/react-drager/LICENSE
 
   publish-npm:
     executor: node/default
