@@ -45,14 +45,12 @@ jobs:
 
 workflows:
   version: 2
-  build-and-publish:
+  manual-publish:
+    when:
+      and:
+        - equal: [manual-publish, << pipeline.trigger_source >>]
     jobs:
       - build-node
       - publish-npm:
           requires:
             - build-node
-          filters:
-            branches:
-              only: main
-            tags:
-              only: /^v.*/
