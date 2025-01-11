@@ -1,4 +1,4 @@
-import type { AnchorPosition } from '../types'
+import type { AnchorPosition, AnchorProps } from '../types'
 import React, { useRef, useState } from 'react'
 import './Anchor.css'
 
