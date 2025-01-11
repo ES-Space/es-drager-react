@@ -1,25 +1,30 @@
 import type { Connection } from './types'
+import _ from 'lodash'
 
 export class ConnectionManager {
   private static instance: ConnectionManager
   private connections: Connection[] = []
-  private svg: SVGSVGElement
+  private readonly svg: SVGSVGElement
   private selectedConnection: Connection | null = null
+  private threshold: number = 10 // Default distance threshold
+  private activeAnchors: Set<string> = new Set()
+  private isSimulating = false
+  private isSimulatingMouseMove = false
 
   private constructor() {
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     this.initSVG()
     this.initEventListeners()
 
-    // 添加窗口大小变化和滚动监听
+    // Added window size change and scroll listener
     window.addEventListener('resize', () => {
       this.updateConnections()
     })
 
-    // 监听滚动事件
+    // Listen for scrolling events
     window.addEventListener('scroll', () => {
       this.updateConnections()
-    }, true) // 使用捕获阶段以确保能捕获到所有滚动事件
+    }, true) // Use the capture stage to ensure that all scrolling events are captured
   }
 
   static getInstance() {
@@ -41,22 +46,134 @@ export class ConnectionManager {
   }
 
   private initEventListeners() {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.selectedConnection) {
-        this.selectedConnection = null
-        this.drawConnections()
-      }
-      else if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedConnection) {
-        this.removeConnection()
+    // 确保只添加一次事件监听器
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.addEventListener('keydown', this.handleKeyDown.bind(this))
+
+    this.svg.removeEventListener('click', this.handleSvgClick)
+    this.svg.addEventListener('click', this.handleSvgClick.bind(this))
+
+    document.removeEventListener('mousemove', this.handleMouseMove.bind(this))
+    document.addEventListener('mousemove', this.handleMouseMove.bind(this))
+  }
+
+  setThreshold(value: number) {
+    this.threshold = value
+  }
+
+  private handleMouseMove = _.throttle((e: MouseEvent) => {
+    if (this.isSimulating || this.isSimulatingMouseMove) // Check if mouse movements are being simulated
+      return
+
+    const mousePosition = { x: e.clientX, y: e.clientY }
+    const nearestAnchor = this.getNearestAnchor(mousePosition)
+    if (nearestAnchor && nearestAnchor.distance <= this.threshold) {
+      this.isSimulatingMouseMove = true
+      this.simulateMouseMove(nearestAnchor.rect)
+      this.isSimulatingMouseMove = false
+    }
+    else {
+      this.activeAnchors.clear()
+    }
+    this.updateActiveAnchors(mousePosition)
+  }, 100)
+
+  private getNearestAnchor(mousePos: { x: number, y: number }): { rect: DOMRect, distance: number } | null {
+    const anchors = Array.from(document.querySelectorAll('.anchor')) as HTMLElement[]
+    let nearestAnchor: { rect: DOMRect, distance: number } | null = null
+
+    anchors.forEach((anchor) => {
+      const rect = anchor.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      const distance = Math.sqrt(
+        (mousePos.x - centerX) ** 2 + (mousePos.y - centerY) ** 2,
+      )
+
+      if (!nearestAnchor || distance < nearestAnchor.distance) {
+        nearestAnchor = { rect, distance }
       }
     })
 
-    this.svg.addEventListener('click', (e) => {
-      if (e.target === this.svg) {
-        this.selectedConnection = null
-        this.drawConnections()
+    return nearestAnchor
+  }
+
+  private simulateMouseMove(rect: DOMRect) {
+    if (this.isSimulating)
+      return
+    this.isSimulating = true
+    try {
+      const event = new MouseEvent('mousemove', {
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+      })
+
+      document.dispatchEvent(event) // Trigger a simulation event
+    }
+    finally {
+      this.isSimulating = false // Make sure the status resets
+    }
+  }
+
+  private updateActiveAnchors(mousePosition: { x: number, y: number }) {
+    const newActiveAnchors = new Set<string>()
+
+    this.connections.forEach((conn) => {
+      const sourceAnchor = this.getAnchorDom(conn.sourceId, conn.sourceAnchor)
+      const targetAnchor = this.getAnchorDom(conn.targetId, conn.targetAnchor)
+
+      if (sourceAnchor && this.isWithinThreshold(mousePosition, sourceAnchor)) {
+        newActiveAnchors.add(`${conn.sourceId}-${conn.sourceAnchor}`)
+      }
+
+      if (targetAnchor && this.isWithinThreshold(mousePosition, targetAnchor)) {
+        newActiveAnchors.add(`${conn.targetId}-${conn.targetAnchor}`)
       }
     })
+
+    if (this.areSetsDifferent(this.activeAnchors, newActiveAnchors)) {
+      this.activeAnchors = newActiveAnchors
+      this.updateAnchorStyles()
+    }
+  }
+
+  private isWithinThreshold(mousePos: { x: number, y: number }, anchor: DOMRect) {
+    const anchorCenter = { x: anchor.left + anchor.width / 2, y: anchor.top + anchor.height / 2 }
+    const distance = Math.sqrt(
+      (anchorCenter.x - mousePos.x) ** 2 + (anchorCenter.y - mousePos.y) ** 2,
+    )
+    return distance <= this.threshold
+  }
+
+  private updateAnchorStyles() {
+    document.querySelectorAll('[data-drager-id]').forEach((element) => {
+      const id = element.getAttribute('data-drager-id')
+      const anchorType = element.getAttribute('data-anchor-type')
+      const key = `${id}-${anchorType}`
+
+      if (this.activeAnchors.has(key)) {
+        element.classList.add('active-anchor')
+      }
+      else {
+        element.classList.remove('active-anchor')
+      }
+    })
+  }
+
+  private getAnchorDom(id: string, anchorType: string): DOMRect | null {
+    const element = document.querySelector(`[data-drager-id="${id}"][data-anchor-type="${anchorType}"]`)
+    return element ? element.getBoundingClientRect() : null
+  }
+
+  private areSetsDifferent(setA: Set<string>, setB: Set<string>) {
+    if (setA.size !== setB.size)
+      return true
+    for (const value of setA) {
+      if (!setB.has(value))
+        return true
+    }
+    return false
   }
 
   addConnection(connection: Connection) {
@@ -83,15 +200,18 @@ export class ConnectionManager {
   }
 
   drawConnections() {
-    while (this.svg.firstChild) {
-      this.svg.removeChild(this.svg.firstChild)
-    }
-
-    this.connections.forEach((conn) => {
-      const pathElement = this.getPathElement(conn)
-      if (pathElement) {
-        this.svg.appendChild(pathElement)
+    // Use request animation frames to refine drawing
+    requestAnimationFrame(() => {
+      while (this.svg.firstChild) {
+        this.svg.removeChild(this.svg.firstChild)
       }
+
+      this.connections.forEach((conn) => {
+        const pathElement = this.getPathElement(conn)
+        if (pathElement) {
+          this.svg.appendChild(pathElement)
+        }
+      })
     })
   }
 
@@ -153,7 +273,7 @@ export class ConnectionManager {
       this.selectedConnection === connection,
     )
 
-    // 添加点击事件
+    // Add a click event
     path.addEventListener('click', (e) => {
       e.stopPropagation()
       this.selectedConnection = connection
@@ -193,12 +313,31 @@ export class ConnectionManager {
     this.drawConnections() // 重新绘制所有连接
   }
 
-  // 添加清理方法
+  // Add a cleanup method
   destroy() {
     window.removeEventListener('resize', this.updateConnections)
     window.removeEventListener('scroll', this.updateConnections, true)
     if (this.svg.parentNode) {
       this.svg.parentNode.removeChild(this.svg)
+    }
+  }
+
+  // A new method for handling keyboard events has been added
+  private handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape' && this.selectedConnection) {
+      this.selectedConnection = null
+      this.drawConnections()
+    }
+    else if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedConnection) {
+      this.removeConnection()
+    }
+  }
+
+  // Added a method for handling SVG click events
+  private handleSvgClick(e: MouseEvent) {
+    if (e.target === this.svg) {
+      this.selectedConnection = null
+      this.drawConnections()
     }
   }
 }
