@@ -52,7 +52,7 @@ export function Examples() {
     return () => observer.disconnect()
   }, [])
 
-  const handleConnect = useCallback((sourceId: string, sourceAnchor: string, targetId: string, targetAnchor: string) => {
+  const handleConnect = useCallback(({ sourceId, sourceAnchor, targetAnchor, targetId }: Connection) => {
     setConnections(prev => [...prev, {
       sourceId,
       sourceAnchor,
@@ -69,7 +69,7 @@ export function Examples() {
             <h3 className="text-sm font-medium mb-4">Basic Usage</h3>
             <div className="h-[200px] relative border rounded-lg">
               <Drager
-                className="w-32 h-32 border-2 border-dashed border-blue-500"
+                className="w-32 h-32 border-2 border-dashed border-blue-500 z-50"
               >
                 <div className="flex items-center justify-center h-full text-blue-500">
                   Drag me
