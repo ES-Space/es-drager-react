@@ -1,12 +1,21 @@
+/**
+ * GuidelineManager is a singleton class that manages the drawing of guide lines.
+ */
 export class GuidelineManager {
   private static instance: GuidelineManager
   private canvas: HTMLCanvasElement
 
+  /**
+   * private constructor
+   */
   private constructor() {
     this.canvas = document.createElement('canvas')
     this.initCanvas()
   }
 
+  /**
+   * get the instance of GuidelineManager
+   */
   static getInstance() {
     if (!this.instance) {
       this.instance = new GuidelineManager()
@@ -14,12 +23,15 @@ export class GuidelineManager {
     return this.instance
   }
 
+  /**
+   * init the canvas
+   */
   private initCanvas() {
     this.canvas.style.position = 'fixed'
     this.canvas.style.top = '0'
     this.canvas.style.left = '0'
     this.canvas.style.pointerEvents = 'none'
-    this.canvas.style.zIndex = '9998' // 比连接线画布低一级
+    this.canvas.style.zIndex = '9998'
 
     const updateCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1
@@ -39,6 +51,9 @@ export class GuidelineManager {
     document.body.appendChild(this.canvas)
   }
 
+  /**
+   * clear the canvas
+   */
   clear() {
     const ctx = this.canvas.getContext('2d')
     if (!ctx)
@@ -46,6 +61,9 @@ export class GuidelineManager {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
+  /**
+   * draw the guidelines
+   */
   drawGuidelines(rect: {
     left: number
     right: number
@@ -63,7 +81,7 @@ export class GuidelineManager {
     ctx.lineWidth = 1
     ctx.setLineDash([4, 4])
 
-    // 绘制垂直辅助线
+    // draw vertical guidelines
     ctx.moveTo(rect.left, 0)
     ctx.lineTo(rect.left, window.innerHeight)
 
@@ -73,7 +91,7 @@ export class GuidelineManager {
     ctx.moveTo(rect.left + rect.width / 2, 0)
     ctx.lineTo(rect.left + rect.width / 2, window.innerHeight)
 
-    // 绘制水平辅助线
+    // draw horizontal guidelines
     ctx.moveTo(0, rect.top)
     ctx.lineTo(window.innerWidth, rect.top)
 

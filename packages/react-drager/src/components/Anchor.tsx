@@ -1,9 +1,4 @@
-import type { AnchorPosition } from '../types'
-
-interface AnchorProps {
-  position: AnchorPosition
-  onDragStart: (position: AnchorPosition) => void
-}
+import type { AnchorPosition, AnchorProps } from '../types'
 
 export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart }) => {
   return (
