@@ -1,27 +1,36 @@
-import type { Connection } from './types'
+import type { Connection } from '../types'
 
+/**
+ * ConnectionManager is a singleton class that manages the drawing of connections.
+ */
 export class ConnectionManager {
   private static instance: ConnectionManager
   private connections: Connection[] = []
   private svg: SVGSVGElement
   private selectedConnection: Connection | null = null
 
+  /**
+   * private constructor
+   */
   private constructor() {
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     this.initSVG()
     this.initEventListeners()
 
-    // 添加窗口大小变化和滚动监听
+    // add window resize and scroll listeners
     window.addEventListener('resize', () => {
       this.updateConnections()
     })
 
-    // 监听滚动事件
+    // listen to scroll events
     window.addEventListener('scroll', () => {
       this.updateConnections()
-    }, true) // 使用捕获阶段以确保能捕获到所有滚动事件
+    }, true) // use capture phase to ensure capturing all scroll events
   }
 
+  /**
+   * get the instance of ConnectionManager
+   */
   static getInstance() {
     if (!this.instance) {
       this.instance = new ConnectionManager()
@@ -29,6 +38,9 @@ export class ConnectionManager {
     return this.instance
   }
 
+  /**
+   * init the svg
+   */
   private initSVG() {
     this.svg.style.position = 'fixed'
     this.svg.style.top = '0'
@@ -40,6 +52,9 @@ export class ConnectionManager {
     document.body.appendChild(this.svg)
   }
 
+  /**
+   * init the event listeners
+   */
   private initEventListeners() {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.selectedConnection) {
@@ -59,11 +74,18 @@ export class ConnectionManager {
     })
   }
 
+  /**
+   * add a connection
+   * @param connection - the connection to add
+   */
   addConnection(connection: Connection) {
     this.connections.push(connection)
     this.drawConnections()
   }
 
+  /**
+   * remove a connection
+   */
   removeConnection() {
     this.connections = this.connections.filter((conn) => {
       if (!this.selectedConnection)
@@ -78,10 +100,17 @@ export class ConnectionManager {
     this.drawConnections()
   }
 
+  /**
+   * get the connections
+   * @returns the connections
+   */
   getConnections() {
     return this.connections
   }
 
+  /**
+   * draw the connections
+   */
   drawConnections() {
     while (this.svg.firstChild) {
       this.svg.removeChild(this.svg.firstChild)
@@ -95,6 +124,11 @@ export class ConnectionManager {
     })
   }
 
+  /**
+   * draw the temporary connection
+   * @param start - the start position
+   * @param end - the end position
+   */
   drawTempConnection(start: { x: number, y: number }, end: { x: number, y: number }) {
     const tempLine = document.getElementById('temp-connection')
     if (tempLine) {
@@ -107,6 +141,12 @@ export class ConnectionManager {
     this.svg.appendChild(path)
   }
 
+  /**
+   * get the anchor position
+   * @param rect - the rect
+   * @param anchor - the anchor
+   * @returns the anchor position
+   */
   private getAnchorPosition(rect: DOMRect, anchor: string) {
     switch (anchor) {
       case 'top':
@@ -134,6 +174,11 @@ export class ConnectionManager {
     }
   }
 
+  /**
+   * get the path element
+   * @param connection - the connection
+   * @returns the path element
+   */
   private getPathElement(connection: Connection): SVGPathElement | null {
     const sourceEl = document.querySelector(`[data-drager-id="${connection.sourceId}"]`)
     const targetEl = document.querySelector(`[data-drager-id="${connection.targetId}"]`)
@@ -153,7 +198,6 @@ export class ConnectionManager {
       this.selectedConnection === connection,
     )
 
-    // 添加点击事件
     path.addEventListener('click', (e) => {
       e.stopPropagation()
       this.selectedConnection = connection
@@ -163,6 +207,13 @@ export class ConnectionManager {
     return path
   }
 
+  /**
+   * create the connection path
+   * @param start - the start position
+   * @param end - the end position
+   * @param isSelected - whether the connection is selected
+   * @returns the path element
+   */
   private createConnectionPath(start: { x: number, y: number }, end: { x: number, y: number }, isSelected = false) {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
     const offsetX = Math.abs(end.x - start.x) * 0.5
@@ -182,6 +233,9 @@ export class ConnectionManager {
     return path
   }
 
+  /**
+   * remove the temporary connection
+   */
   removeTempConnection() {
     const tempLine = document.getElementById('temp-connection')
     if (tempLine) {
@@ -189,11 +243,16 @@ export class ConnectionManager {
     }
   }
 
+  /**
+   * update the connections
+   */
   updateConnections() {
-    this.drawConnections() // 重新绘制所有连接
+    this.drawConnections()
   }
 
-  // 添加清理方法
+  /**
+   * destroy the connection manager
+   */
   destroy() {
     window.removeEventListener('resize', this.updateConnections)
     window.removeEventListener('scroll', this.updateConnections, true)

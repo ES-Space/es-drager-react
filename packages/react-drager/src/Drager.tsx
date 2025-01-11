@@ -1,14 +1,11 @@
-import type { AnchorPosition, DragerProps } from './types'
+import type { AnchorPosition, Connection, DragerProps } from './types'
 import { RotateCw } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { Anchor } from './components/Anchor'
-import { ConnectionManager } from './ConnectionManager'
-import { GuidelineManager } from './GuidelineManager'
-import { getAnchorPosition, getDragerElements, getSnapPosition } from './utils'
+import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
   id,
-  connectable = false,
   children,
   className,
   style,
@@ -21,13 +18,15 @@ export const Drager: React.FC<DragerProps> = ({
   showGuides = false,
   snapThreshold = 5,
   snapToElements = false,
-  onConnect,
+  connectable = false,
   onDragStart,
   onDragEnd,
   onDrag,
   onRotate,
   onScale,
+  onConnect,
 }) => {
+  /** id is required when connectable is true */
   if (connectable && !id) {
     throw new Error('id prop is required when connectable is true')
   }
@@ -49,12 +48,16 @@ export const Drager: React.FC<DragerProps> = ({
   const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null)
   const animationFrameId = useRef<number | null>(null)
 
+  /**
+   * handle the anchor drag event
+   * @param e - the mouse event
+   */
   const handleAnchorDrag = (e: MouseEvent) => {
     const elements = document.elementsFromPoint(e.clientX, e.clientY)
     const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
     const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
 
-    // 添加临时连接线的绘制
+    // add temp connection line
     if (contentRef.current && connectingAnchor.current) {
       const rect = contentRef.current.getBoundingClientRect()
       const startPos = getAnchorPosition(rect, connectingAnchor.current)
@@ -80,6 +83,10 @@ export const Drager: React.FC<DragerProps> = ({
     }
   }
 
+  /**
+   * handle the anchor drag end event
+   * @param e - the mouse event
+   */
   const handleAnchorDragEnd = (e: MouseEvent) => {
     if (!connectingAnchor.current || !id)
       return
@@ -107,7 +114,12 @@ export const Drager: React.FC<DragerProps> = ({
             targetId,
             targetAnchor: targetPosition,
           })
-          onConnect?.(id, connectingAnchor.current, targetId, targetPosition)
+          onConnect?.({
+            sourceId: id,
+            sourceAnchor: connectingAnchor.current,
+            targetId,
+            targetAnchor: targetPosition,
+          } as Connection)
           connectionCreated = true
         }
       }
@@ -127,12 +139,21 @@ export const Drager: React.FC<DragerProps> = ({
     document.removeEventListener('mouseup', handleAnchorDragEnd)
   }
 
+  /**
+   * handle the anchor drag start event
+   * @param position - the anchor position
+   */
   const handleAnchorDragStart = (position: AnchorPosition) => {
     connectingAnchor.current = position
     document.addEventListener('mousemove', handleAnchorDrag)
     document.addEventListener('mouseup', handleAnchorDragEnd)
   }
 
+  /**
+   * handle the anchor mouse down event
+   * @param position - the anchor position
+   * @returns the mouse event
+   */
   const handleAnchorMouseDown = (position: AnchorPosition) => (e: MouseEvent) => {
     e.stopPropagation()
     if (!contentRef.current)
@@ -141,7 +162,7 @@ export const Drager: React.FC<DragerProps> = ({
     connectingAnchor.current = position
     const rect = contentRef.current.getBoundingClientRect()
     const startPos = getAnchorPosition(rect, position)
-    setMousePos(startPos) // 设置初始位置
+    setMousePos(startPos)
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY })
@@ -149,7 +170,7 @@ export const Drager: React.FC<DragerProps> = ({
 
     const handleMouseUp = (e: MouseEvent) => {
       handleAnchorDragEnd(e)
-      setMousePos(null) // 清除鼠标位置
+      setMousePos(null)
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
@@ -161,9 +182,15 @@ export const Drager: React.FC<DragerProps> = ({
   useEffect(() => {
     const content = contentRef.current
     const rotateHandle = rotateHandleRef.current
+
     if (!content)
       return
 
+    /**
+     * limit the position of the element
+     * @param pos - the position to limit
+     * @returns the limited position
+     */
     const limitPosition = (pos: { x: number, y: number }) => {
       if (!limit)
         return pos
@@ -173,11 +200,18 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
+    /**
+     * update the transform of the element
+     */
     const updateTransform = () => {
       content.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
     }
 
+    /**
+     * draw the guides
+     */
     const drawGuides = () => {
+      // if the element is not dragging or the guides are not shown, return
       if (!content || !isDragging.current || !showGuides)
         return
 
@@ -211,6 +245,10 @@ export const Drager: React.FC<DragerProps> = ({
       animationFrameId.current = requestAnimationFrame(draw)
     }
 
+    /**
+     * handle the mouse down event
+     * @param e - the mouse event
+     */
     const handleMouseDown = (e: MouseEvent) => {
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
@@ -223,23 +261,10 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    const handleRotateStart = (e: MouseEvent) => {
-      if (!rotatable)
-        return
-      e.preventDefault()
-      e.stopPropagation()
-      isRotating.current = true
-      const rect = content.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
-      // store initial angle and current rotation
-      startRotation.current = {
-        angle: Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI,
-        rotation: currentRotation.current,
-      }
-    }
-
+    /**
+     * handle the mouse move event
+     * @param e - the mouse event
+     */
     const handleMouseMove = (e: MouseEvent) => {
       currentMousePos.current = { x: e.clientX, y: e.clientY }
 
@@ -326,6 +351,9 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
+    /**
+     * handle the mouse up event
+     */
     const handleMouseUp = () => {
       if (isDragging.current) {
         isDragging.current = false
@@ -333,12 +361,33 @@ export const Drager: React.FC<DragerProps> = ({
         if (content) {
           content.style.willChange = ''
         }
-        // 清除辅助线
+        // clear the guidelines
         const guidelineManager = GuidelineManager.getInstance()
         guidelineManager.clear()
       }
       if (isRotating.current) {
         isRotating.current = false
+      }
+    }
+
+    /**
+     * handle the rotate start event
+     * @param e - the mouse event
+     */
+    const handleRotateStart = (e: MouseEvent) => {
+      if (!rotatable)
+        return
+      e.preventDefault()
+      e.stopPropagation()
+      isRotating.current = true
+      const rect = content.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      // store initial angle and current rotation
+      startRotation.current = {
+        angle: Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI,
+        rotation: currentRotation.current,
       }
     }
 
@@ -367,53 +416,6 @@ export const Drager: React.FC<DragerProps> = ({
       content.addEventListener('wheel', handleWheel, { passive: false })
     }
     requestAnimationFrame(draw)
-
-    const handleAnchorDragEnd = (e: MouseEvent) => {
-      if (!connectingAnchor.current || !id)
-        return
-
-      const elements = document.elementsFromPoint(e.clientX, e.clientY)
-      const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
-      const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
-
-      let connectionCreated = false
-
-      if (targetAnchor && targetDrager) {
-        const targetId = targetDrager.getAttribute('data-drager-id')
-        const targetPosition = targetAnchor.getAttribute('data-position') as AnchorPosition
-
-        if (targetId && targetId !== id) {
-          const targetRect = targetDrager.getBoundingClientRect()
-          const anchorPos = getAnchorPosition(targetRect, targetPosition)
-          const distance = Math.hypot(e.clientX - anchorPos.x, e.clientY - anchorPos.y)
-
-          if (distance < 20) {
-            const connectionManager = ConnectionManager.getInstance()
-            connectionManager.addConnection({
-              sourceId: id,
-              sourceAnchor: connectingAnchor.current,
-              targetId,
-              targetAnchor: targetPosition,
-            })
-            onConnect?.(id, connectingAnchor.current, targetId, targetPosition)
-            connectionCreated = true
-          }
-        }
-      }
-
-      // 如果没有创建连接，移除临时连接线
-      if (!connectionCreated) {
-        ConnectionManager.getInstance().removeTempConnection()
-      }
-
-      // clean up state
-      connectingAnchor.current = null
-      document.querySelectorAll('.anchor').forEach((anchor) => {
-        anchor.classList.remove('anchor-hover')
-      })
-      document.removeEventListener('mousemove', handleAnchorDrag)
-      document.removeEventListener('mouseup', handleAnchorDragEnd)
-    }
 
     // add connection point event listener
     const anchors = content.querySelectorAll('.anchor')
@@ -478,10 +480,10 @@ export const Drager: React.FC<DragerProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+
           }}
-          className="hover:scale-110"
         >
-          <RotateCw className="w-4 h-4 text-blue-500" />
+          <RotateCw style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
         </div>
       )}
     </div>
