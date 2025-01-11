@@ -54,7 +54,7 @@ export const Drager: React.FC<DragerProps> = ({
     const targetAnchor = elements.find(el => el.hasAttribute('data-position'))
     const targetDrager = elements.find(el => el.hasAttribute('data-drager-id'))
 
-    // 添加临时连接线的绘制
+    // Add a draw of a temporary connection line
     if (contentRef.current && connectingAnchor.current) {
       const rect = contentRef.current.getBoundingClientRect()
       const startPos = getAnchorPosition(rect, connectingAnchor.current)
@@ -113,7 +113,7 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    // 如果没有创建连接，移除临时连接线
+    // If no connection is created, remove the temporary connection cable
     if (!connectionCreated) {
       ConnectionManager.getInstance().removeTempConnection()
     }
