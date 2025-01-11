@@ -2,15 +2,6 @@ import type { AnchorPosition, AnchorProps } from '../types'
 import React, { useRef, useState } from 'react'
 import './Anchor.css'
 
-interface AnchorProps {
-  position: AnchorPosition
-  onDragStart: (position: AnchorPosition) => void
-  // Triggers a connection range threshold
-  threshold?: number
-  // Whether to enter the range
-  isInRange?: boolean
-}
-
 export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart, threshold = 10 }) => {
   const [isFlashing, setIsFlashing] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)

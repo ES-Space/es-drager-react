@@ -1,3 +1,5 @@
+import type React from 'react'
+
 export interface DragerProps {
   /** unique id for the element */
   id?: string
@@ -65,4 +67,7 @@ export interface Connection {
 export interface AnchorProps {
   position: AnchorPosition
   onDragStart: (position: AnchorPosition) => void
+  threshold?: number
+  // Whether to enter the range
+  isInRange?: boolean
 }
