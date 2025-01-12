@@ -42,6 +42,8 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.17.14",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.263.0"
   },
   "devDependencies": {
