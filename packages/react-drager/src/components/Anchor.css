@@ -1,0 +1,25 @@
+@keyframes borderFlash {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+.anchor {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    cursor: crosshair;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.flashing {
+    animation: borderFlash 1s infinite;
+}

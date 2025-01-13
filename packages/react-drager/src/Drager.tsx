@@ -125,7 +125,7 @@ export const Drager: React.FC<DragerProps> = ({
       }
     }
 
-    // 如果没有创建连接，移除临时连接线
+    // If no connection is created, remove the temporary connection cable
     if (!connectionCreated) {
       ConnectionManager.getInstance().removeTempConnection()
     }

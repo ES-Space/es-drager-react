@@ -1,9 +1,40 @@
 import type { AnchorPosition, AnchorProps } from '../types'
+import React, { useRef, useState } from 'react'
+import './Anchor.css'
 
-export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart }) => {
+export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart, threshold = 10 }) => {
+  const [isFlashing, setIsFlashing] = useState(false)
+  const anchorRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!anchorRef.current)
+      return
+
+    // 获取连接点位置
+    const anchorRect = anchorRef.current.getBoundingClientRect()
+    const anchorX = anchorRect.left + anchorRect.width / 2
+    const anchorY = anchorRect.top + anchorRect.height / 2
+
+    // 计算鼠标到连接点的距离
+    const distance = Math.sqrt(
+      (e.clientX - anchorX) ** 2 + (e.clientY - anchorY) ** 2,
+    )
+
+    // 如果距离小于某个阈值，触发闪烁效果
+    if (distance < threshold) {
+      setIsFlashing(true)
+    }
+    else {
+      setIsFlashing(false)
+    }
+  }
+
+  document.addEventListener('mousemove', handleMouseMove)
+
   return (
     <div
-      className="anchor"
+      ref={anchorRef}
+      className={`anchor ${isFlashing ? 'flashing' : ''}`}
       data-position={position}
       style={{
         position: 'absolute',
