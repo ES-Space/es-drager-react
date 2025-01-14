@@ -13,11 +13,19 @@ export class ConnectionManager {
   private activeAnchors: Set<string> = new Set()
   private isSimulating = false
   private isSimulatingMouseMove = false
+  private updateRAF: number | null = null
+
+  private boundHandleKeyDown: (e: KeyboardEvent) => void
+  private boundHandleMouseMove: ReturnType<typeof _.throttle>
+  private boundHandleSvgClick: (e: MouseEvent) => void
 
   /**
    * private constructor
    */
   private constructor() {
+    this.boundHandleKeyDown = this.handleKeyDown.bind(this)
+    this.boundHandleMouseMove = _.throttle(this.handleMouseMove.bind(this), 100)
+    this.boundHandleSvgClick = this.handleSvgClick.bind(this)
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     this.initSVG()
     this.initEventListeners()
@@ -61,37 +69,35 @@ export class ConnectionManager {
    * init the event listeners
    */
   private initEventListeners() {
-    // 确保只添加一次事件监听器
-    document.removeEventListener('keydown', this.handleKeyDown)
-    document.addEventListener('keydown', this.handleKeyDown.bind(this))
-
-    this.svg.removeEventListener('click', this.handleSvgClick)
-    this.svg.addEventListener('click', this.handleSvgClick.bind(this))
-
-    document.removeEventListener('mousemove', this.handleMouseMove.bind(this))
-    document.addEventListener('mousemove', this.handleMouseMove.bind(this))
+    document.addEventListener('keydown', this.boundHandleKeyDown)
+    this.svg.addEventListener('click', this.boundHandleSvgClick)
+    document.addEventListener('mousemove', this.boundHandleMouseMove)
   }
 
   setThreshold(value: number) {
     this.threshold = value
   }
 
-  private handleMouseMove = _.throttle((e: MouseEvent) => {
-    if (this.isSimulating || this.isSimulatingMouseMove) // Check if mouse movements are being simulated
+  private handleMouseMove(e: MouseEvent) {
+    if (this.isSimulating || this.isSimulatingMouseMove)
       return
 
     const mousePosition = { x: e.clientX, y: e.clientY }
     const nearestAnchor = this.getNearestAnchor(mousePosition)
+
     if (nearestAnchor && nearestAnchor.distance <= this.threshold) {
       this.isSimulatingMouseMove = true
-      this.simulateMouseMove(nearestAnchor.rect)
+      this.updateActiveAnchors({
+        x: nearestAnchor.rect.left + nearestAnchor.rect.width / 2,
+        y: nearestAnchor.rect.top + nearestAnchor.rect.height / 2,
+      })
       this.isSimulatingMouseMove = false
     }
     else {
       this.activeAnchors.clear()
+      this.updateActiveAnchors(mousePosition)
     }
-    this.updateActiveAnchors(mousePosition)
-  }, 100)
+  }
 
   private getNearestAnchor(mousePos: { x: number, y: number }): { rect: DOMRect, distance: number } | null {
     const anchors = Array.from(document.querySelectorAll('.anchor')) as HTMLElement[]
@@ -112,23 +118,6 @@ export class ConnectionManager {
     })
 
     return nearestAnchor
-  }
-
-  private simulateMouseMove(rect: DOMRect) {
-    if (this.isSimulating)
-      return
-    this.isSimulating = true
-    try {
-      const event = new MouseEvent('mousemove', {
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2,
-      })
-
-      document.dispatchEvent(event) // Trigger a simulation event
-    }
-    finally {
-      this.isSimulating = false // Make sure the status resets
-    }
   }
 
   private updateActiveAnchors(mousePosition: { x: number, y: number }) {
@@ -214,6 +203,7 @@ export class ConnectionManager {
         && conn.targetAnchor === this.selectedConnection.targetAnchor
       )
     })
+
     this.drawConnections()
   }
 
@@ -230,18 +220,20 @@ export class ConnectionManager {
    */
   drawConnections() {
     // Use request animation frames to refine drawing
-    requestAnimationFrame(() => {
-      while (this.svg.firstChild) {
-        this.svg.removeChild(this.svg.firstChild)
-      }
+    const fragment = document.createDocumentFragment()
 
-      this.connections.forEach((conn) => {
-        const pathElement = this.getPathElement(conn)
-        if (pathElement) {
-          this.svg.appendChild(pathElement)
-        }
-      })
+    while (this.svg.firstChild) {
+      this.svg.removeChild(this.svg.firstChild)
+    }
+
+    this.connections.forEach((conn) => {
+      const pathElement = this.getPathElement(conn)
+      if (pathElement) {
+        fragment.appendChild(pathElement)
+      }
     })
+
+    this.svg.appendChild(fragment)
   }
 
   /**
@@ -364,22 +356,50 @@ export class ConnectionManager {
     }
   }
 
+  private debouncedUpdate = _.debounce(() => {
+    if (this.updateRAF) {
+      cancelAnimationFrame(this.updateRAF)
+    }
+    this.updateRAF = requestAnimationFrame(() => {
+      this.drawConnections()
+      this.updateRAF = null
+    })
+  }, 16)
+
   /**
    * update the connections
    */
   updateConnections() {
-    this.drawConnections()
+    this.debouncedUpdate()
   }
 
   /**
    * destroy the connection manager
    */
   destroy() {
+    document.removeEventListener('keydown', this.boundHandleKeyDown)
+    this.svg.removeEventListener('click', this.boundHandleSvgClick)
+    document.removeEventListener('mousemove', this.boundHandleMouseMove)
+
+    if (this.boundHandleMouseMove.cancel) {
+      this.boundHandleMouseMove.cancel()
+    }
+
     window.removeEventListener('resize', this.updateConnections)
     window.removeEventListener('scroll', this.updateConnections, true)
+
+    if (this.updateRAF) {
+      cancelAnimationFrame(this.updateRAF)
+      this.updateRAF = null
+    }
+
     if (this.svg.parentNode) {
       this.svg.parentNode.removeChild(this.svg)
     }
+
+    this.connections = []
+    this.selectedConnection = null
+    this.activeAnchors.clear()
   }
 
   // A new method for handling keyboard events has been added
