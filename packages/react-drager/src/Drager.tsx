@@ -182,6 +182,8 @@ export const Drager: React.FC<DragerProps> = ({
   useEffect(() => {
     const content = contentRef.current
     const rotateHandle = rotateHandleRef.current
+    let frameId: number | null = null
+    const anchorListeners = new Map()
 
     if (!content)
       return
@@ -234,7 +236,6 @@ export const Drager: React.FC<DragerProps> = ({
         drawGuides()
       }
 
-      // 如果有鼠标位置和起始锚点，绘制临时连接线
       if (mousePos && connectingAnchor.current && content) {
         const rect = content.getBoundingClientRect()
         const startPos = getAnchorPosition(rect, connectingAnchor.current)
@@ -242,7 +243,11 @@ export const Drager: React.FC<DragerProps> = ({
         connectionManager.drawTempConnection(startPos, mousePos)
       }
 
-      animationFrameId.current = requestAnimationFrame(draw)
+      frameId = requestAnimationFrame(draw)
+    }
+
+    if (mousePos && connectingAnchor.current) {
+      frameId = requestAnimationFrame(draw)
     }
 
     /**
@@ -282,11 +287,9 @@ export const Drager: React.FC<DragerProps> = ({
         const angleDiff = currentAngle - startRotation.current.angle
         currentRotation.current = startRotation.current.rotation + angleDiff
 
-        requestAnimationFrame(() => {
-          updateTransform()
-          onRotate?.(currentRotation.current)
-          ConnectionManager.getInstance().updateConnections()
-        })
+        updateTransform()
+        onRotate?.(currentRotation.current)
+        ConnectionManager.getInstance().updateConnections()
         return
       }
 
@@ -323,11 +326,9 @@ export const Drager: React.FC<DragerProps> = ({
           content.style.willChange = 'transform'
         }
 
-        requestAnimationFrame(() => {
-          updateTransform()
-          onDrag?.(currentPos.current)
-          ConnectionManager.getInstance().updateConnections()
-        })
+        updateTransform()
+        onDrag?.(currentPos.current)
+        ConnectionManager.getInstance().updateConnections()
       }
 
       if (isRotating.current) {
@@ -415,16 +416,21 @@ export const Drager: React.FC<DragerProps> = ({
     if (scalable) {
       content.addEventListener('wheel', handleWheel, { passive: false })
     }
-    requestAnimationFrame(draw)
 
     // add connection point event listener
     const anchors = content.querySelectorAll('.anchor')
     anchors.forEach((anchor) => {
       const position = anchor.getAttribute('data-position') as AnchorPosition
-      anchor.addEventListener('mousedown', (e: Event) => handleAnchorMouseDown(position)(e as MouseEvent))
+      const listener = (e: Event) => handleAnchorMouseDown(position)(e as MouseEvent)
+      anchorListeners.set(anchor, listener)
+      anchor.addEventListener('mousedown', listener)
     })
 
     return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+        frameId = null
+      }
       content.removeEventListener('mousedown', handleMouseDown)
       if (rotatable && rotateHandle) {
         rotateHandle.removeEventListener('mousedown', handleRotateStart)
@@ -439,6 +445,9 @@ export const Drager: React.FC<DragerProps> = ({
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current)
       }
+      anchorListeners.forEach((listener, anchor) => {
+        anchor.removeEventListener('mousedown', listener)
+      })
     }
   }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, onConnect, mousePos])
 
