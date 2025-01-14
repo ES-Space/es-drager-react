@@ -1,14 +1,7 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
-
-interface Connection {
-  sourceId: string
-  sourceAnchor: string
-  targetId: string
-  targetAnchor: string
-}
+import { useEffect, useRef, useState } from 'react'
 
 export function Examples() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -16,7 +9,6 @@ export function Examples() {
     maxX: 0,
     maxY: 0,
   })
-  const [_, setConnections] = useState<Connection[]>([])
   const [dragers] = useState([
     { id: 'drager-1', label: 'Drager 1', x: 100, y: 20 },
     { id: 'drager-2', label: 'Drager 2', x: 300, y: 20 },
@@ -52,14 +44,10 @@ export function Examples() {
     return () => observer.disconnect()
   }, [])
 
-  const handleConnect = useCallback(({ sourceId, sourceAnchor, targetAnchor, targetId }: Connection) => {
-    setConnections(prev => [...prev, {
-      sourceId,
-      sourceAnchor,
-      targetId,
-      targetAnchor,
-    }])
-  }, [])
+  const handleConnect = () => {
+    // eslint-disable-next-line no-console
+    console.log('connect')
+  }
 
   return (
     <div className="flex-1 p-8 bg-gray-50">
