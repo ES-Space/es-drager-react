@@ -37,20 +37,29 @@ jobs:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
-          name: Update version
-          command: cd packages/react-drager && npm version patch
+          name: Set version from GitHub Release
+          command: |
+            VERSION=${CIRCLE_TAG#v}
+            cd packages/react-drager && npm version $VERSION --no-git-tag-version
       - run:
           name: Publish package
           command: cd packages/react-drager && npm publish --access public
 
 workflows:
   version: 2
-  manual-publish:
-    when:
-      and:
-        - equal: [manual-publish, << pipeline.trigger_source >>]
+  release:
     jobs:
-      - build-node
+      - build-node:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - publish-npm:
           requires:
             - build-node
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
