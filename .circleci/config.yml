@@ -40,6 +40,11 @@ jobs:
           name: Set version from GitHub Release
           command: |
             VERSION=${CIRCLE_TAG#v}
+            if [ -z "$VERSION" ]; then
+              echo "No version tag found"
+              exit 1
+            fi
+            echo "Publishing version: $VERSION"
             cd packages/react-drager && npm version $VERSION --no-git-tag-version
       - run:
           name: Publish package
