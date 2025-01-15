@@ -62,7 +62,7 @@ export const Drager: React.FC<DragerProps> = ({
       const rect = contentRef.current.getBoundingClientRect()
       const startPos = getAnchorPosition(rect, connectingAnchor.current)
       const endPos = { x: e.clientX, y: e.clientY }
-      ConnectionManager.getInstance().drawTempConnection(startPos, endPos)
+      ConnectionManager.getInstance()?.drawTempConnection(startPos, endPos)
     }
 
     document.querySelectorAll('.anchor').forEach((anchor) => {
@@ -108,7 +108,7 @@ export const Drager: React.FC<DragerProps> = ({
 
         if (distance < 20) {
           const connectionManager = ConnectionManager.getInstance()
-          connectionManager.addConnection({
+          connectionManager?.addConnection({
             sourceId: id,
             sourceAnchor: connectingAnchor.current,
             targetId,
@@ -127,7 +127,7 @@ export const Drager: React.FC<DragerProps> = ({
 
     // If no connection is created, remove the temporary connection cable
     if (!connectionCreated) {
-      ConnectionManager.getInstance().removeTempConnection()
+      ConnectionManager.getInstance()?.removeTempConnection()
     }
 
     // clean up state
@@ -240,7 +240,9 @@ export const Drager: React.FC<DragerProps> = ({
         const rect = content.getBoundingClientRect()
         const startPos = getAnchorPosition(rect, connectingAnchor.current)
         const connectionManager = ConnectionManager.getInstance()
-        connectionManager.drawTempConnection(startPos, mousePos)
+        if (connectionManager) {
+          connectionManager.drawTempConnection(startPos, mousePos)
+        }
       }
 
       frameId = requestAnimationFrame(draw)
@@ -289,7 +291,8 @@ export const Drager: React.FC<DragerProps> = ({
 
         updateTransform()
         onRotate?.(currentRotation.current)
-        ConnectionManager.getInstance().updateConnections()
+        const connectionManager = ConnectionManager.getInstance()
+        connectionManager?.updateConnections()
         return
       }
 
@@ -342,7 +345,8 @@ export const Drager: React.FC<DragerProps> = ({
 
         updateTransform()
         onDrag?.(currentPos.current)
-        ConnectionManager.getInstance().updateConnections()
+        const connectionManager = ConnectionManager.getInstance()
+        connectionManager?.updateConnections()
       }
 
       if (isRotating.current) {
@@ -361,7 +365,8 @@ export const Drager: React.FC<DragerProps> = ({
         requestAnimationFrame(() => {
           updateTransform()
           onRotate?.(currentRotation.current)
-          ConnectionManager.getInstance().updateConnections()
+          const connectionManager = ConnectionManager.getInstance()
+          connectionManager?.updateConnections()
         })
       }
     }
@@ -419,7 +424,8 @@ export const Drager: React.FC<DragerProps> = ({
       currentScale.current = newScale
       updateTransform()
       onScale?.(newScale)
-      ConnectionManager.getInstance().updateConnections()
+      const connectionManager = ConnectionManager.getInstance()
+      connectionManager?.updateConnections()
     }
 
     content.addEventListener('mousedown', handleMouseDown)

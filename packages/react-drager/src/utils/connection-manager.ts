@@ -7,7 +7,7 @@ import _ from 'lodash'
 export class ConnectionManager {
   private static instance: ConnectionManager
   private connections: Connection[] = []
-  private svg: SVGSVGElement
+  private svg!: SVGSVGElement
   private selectedConnection: Connection | null = null
   private threshold: number = 10 // Default distance threshold
   private activeAnchors: Set<string> = new Set()
@@ -15,36 +15,39 @@ export class ConnectionManager {
   private isSimulatingMouseMove = false
   private updateRAF: number | null = null
 
-  private boundHandleKeyDown: (e: KeyboardEvent) => void
-  private boundHandleMouseMove: ReturnType<typeof _.throttle>
-  private boundHandleSvgClick: (e: MouseEvent) => void
+  private boundHandleKeyDown: ((e: KeyboardEvent) => void) | undefined
+  private boundHandleMouseMove: ReturnType<typeof _.throttle> | undefined
+  private boundHandleSvgClick: ((e: MouseEvent) => void) | undefined
 
   /**
    * private constructor
    */
   private constructor() {
-    this.boundHandleKeyDown = this.handleKeyDown.bind(this)
-    this.boundHandleMouseMove = _.throttle(this.handleMouseMove.bind(this), 100)
-    this.boundHandleSvgClick = this.handleSvgClick.bind(this)
-    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    this.initSVG()
-    this.initEventListeners()
+    if (typeof window !== 'undefined') {
+      this.boundHandleKeyDown = this.handleKeyDown.bind(this)
+      this.boundHandleMouseMove = _.throttle(this.handleMouseMove.bind(this), 100)
+      this.boundHandleSvgClick = this.handleSvgClick.bind(this)
+      this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      this.initSVG()
+      this.initEventListeners()
 
-    // add window resize and scroll listeners
-    window.addEventListener('resize', () => {
-      this.updateConnections()
-    })
+      window.addEventListener('resize', () => {
+        this.updateConnections()
+      })
 
-    // listen to scroll events
-    window.addEventListener('scroll', () => {
-      this.updateConnections()
-    }, true) // use capture phase to ensure capturing all scroll events
+      window.addEventListener('scroll', () => {
+        this.updateConnections()
+      }, true)
+    }
   }
 
   /**
    * get the instance of ConnectionManager
    */
   static getInstance() {
+    if (typeof window === 'undefined') {
+      return null
+    }
     if (!this.instance) {
       this.instance = new ConnectionManager()
     }
@@ -69,9 +72,12 @@ export class ConnectionManager {
    * init the event listeners
    */
   private initEventListeners() {
-    document.addEventListener('keydown', this.boundHandleKeyDown)
-    this.svg.addEventListener('click', this.boundHandleSvgClick)
-    document.addEventListener('mousemove', this.boundHandleMouseMove)
+    if (this.boundHandleKeyDown)
+      document.addEventListener('keydown', this.boundHandleKeyDown)
+    if (this.boundHandleSvgClick)
+      this.svg.addEventListener('click', this.boundHandleSvgClick)
+    if (this.boundHandleMouseMove)
+      document.addEventListener('mousemove', this.boundHandleMouseMove)
   }
 
   setThreshold(value: number) {
@@ -377,11 +383,14 @@ export class ConnectionManager {
    * destroy the connection manager
    */
   destroy() {
-    document.removeEventListener('keydown', this.boundHandleKeyDown)
-    this.svg.removeEventListener('click', this.boundHandleSvgClick)
-    document.removeEventListener('mousemove', this.boundHandleMouseMove)
+    if (this.boundHandleKeyDown)
+      document.removeEventListener('keydown', this.boundHandleKeyDown)
+    if (this.boundHandleSvgClick)
+      this.svg.removeEventListener('click', this.boundHandleSvgClick)
+    if (this.boundHandleMouseMove)
+      document.removeEventListener('mousemove', this.boundHandleMouseMove)
 
-    if (this.boundHandleMouseMove.cancel) {
+    if (this.boundHandleMouseMove?.cancel) {
       this.boundHandleMouseMove.cancel()
     }
 
