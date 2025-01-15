@@ -4,9 +4,9 @@ import { Drager } from '@es-space/es-drager-react'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ConnectionsPage() {
-  const handleConnect = (sourceId: string, sourceAnchor: string, targetId: string, targetAnchor: string) => {
+  const handleConnect = () => {
     // eslint-disable-next-line no-console
-    console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
+    console.log('connect')
   }
 
   return (
