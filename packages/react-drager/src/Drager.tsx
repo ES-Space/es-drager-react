@@ -326,6 +326,20 @@ export const Drager: React.FC<DragerProps> = ({
           content.style.willChange = 'transform'
         }
 
+        if (showGuides) {
+          const rect = content.getBoundingClientRect()
+          const guidelineManager = GuidelineManager.getInstance()
+          guidelineManager.clear()
+          guidelineManager.drawGuidelines({
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+            width: rect.width,
+            height: rect.height,
+          })
+        }
+
         updateTransform()
         onDrag?.(currentPos.current)
         ConnectionManager.getInstance().updateConnections()
@@ -362,9 +376,10 @@ export const Drager: React.FC<DragerProps> = ({
         if (content) {
           content.style.willChange = ''
         }
-        // clear the guidelines
-        const guidelineManager = GuidelineManager.getInstance()
-        guidelineManager.clear()
+        if (showGuides) {
+          const guidelineManager = GuidelineManager.getInstance()
+          guidelineManager.clear()
+        }
       }
       if (isRotating.current) {
         isRotating.current = false
