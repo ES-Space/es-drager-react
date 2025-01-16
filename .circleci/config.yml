@@ -3,27 +3,60 @@ orbs:
   node: circleci/node@5
 
 jobs:
-  test:
+  build-node:
     executor: node/default
     steps:
       - checkout
-      - run: echo "test"
+      - run:
+          name: Install bun
+          command: |
+            curl -fsSL https://bun.sh/install | bash
+            echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
+            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Build package
+          command: cd packages/react-drager && bun install && bun run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - packages/react-drager/dist
+            - packages/react-drager/package.json
+            - packages/react-drager/README.md
+            - packages/react-drager/LICENSE
+
+  publish-npm:
+    executor: node/default
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
+          name: Set version from tag
+          command: |
+            VERSION=${CIRCLE_TAG#v}
+            cd packages/react-drager && npm version $VERSION --no-git-tag-version
+      - run:
+          name: Publish package
+          command: cd packages/react-drager && npm publish --access public
 
 workflows:
   version: 2
-  build-and-publish:
+  release:
     jobs:
-      - test:
+      - build-node:
           filters:
-            branches:
-              only: main
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
       - publish-npm:
           requires:
-            - test
+            - build-node
           filters:
-            branches:
-              only: main
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
