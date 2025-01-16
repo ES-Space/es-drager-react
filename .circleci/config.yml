@@ -15,15 +15,12 @@ workflows:
     jobs:
       - test:
           filters:
-            branches:
-              only: main
             tags:
               only: /^v.*/
       - publish-npm:
           requires:
             - test
           filters:
-            branches:
-              only: main
             tags:
               only: /^v.*/
+          type: approval
