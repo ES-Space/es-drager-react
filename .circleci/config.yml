@@ -34,10 +34,14 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
       - publish-npm:
           requires:
             - test
           filters:
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
           type: approval
