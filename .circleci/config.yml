@@ -15,6 +15,11 @@ jobs:
       - checkout
       - node/install-packages
       - run:
+          name: Update version from git tag
+          command: |
+            VERSION=${CIRCLE_TAG#v}
+            npm version $VERSION --no-git-tag-version --allow-same-version
+      - run:
           name: Authenticate with NPM
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
