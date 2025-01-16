@@ -1,7 +1,7 @@
 {
   "name": "@es-space/es-drager-react",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.0.0-development",
   "description": "A React component for dragging, rotating and scaling",
   "license": "MIT",
   "homepage": "https://es-space.github.io/es-drager-react",
