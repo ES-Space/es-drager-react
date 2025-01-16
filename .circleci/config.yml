@@ -9,6 +9,18 @@ jobs:
       - checkout
       - run: echo "test"
 
+  publish-npm:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: Authenticate with NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
+          name: Publish to NPM
+          command: npm publish --access public
+
 workflows:
   version: 2
   build-and-publish:
