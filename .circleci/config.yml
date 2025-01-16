@@ -32,20 +32,22 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Debug Workspace
+          name: Debug Environment
           command: |
-            cd packages/react-drager
-            echo "当前目录内容："
-            ls -la
-            echo "package.json内容："
-            cat package.json
+            echo "CIRCLE_TAG: ${CIRCLE_TAG}"
+            echo "All environment variables:"
+            env | grep CIRCLE || true
       - run:
           name: Update version from git tag
           command: |
+            if [ -z "$CIRCLE_TAG" ]; then
+              echo "Error: No tag found"
+              exit 1
+            fi
             VERSION=${CIRCLE_TAG#v}
             echo "设置版本: ${VERSION}"
             cd packages/react-drager
-            npm version $VERSION --no-git-tag-version --allow-same-version
+            npm version $VERSION --no-git-tag-version --allow-same-version || echo "Version update failed"
       - run:
           name: Authenticate with NPM
           command: |
