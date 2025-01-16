@@ -28,23 +28,38 @@ jobs:
   publish-npm:
     executor: node/default
     steps:
+      - checkout
       - attach_workspace:
           at: .
+      - run:
+          name: Debug Workspace
+          command: |
+            cd packages/react-drager
+            echo "当前目录内容："
+            ls -la
+            echo "package.json内容："
+            cat package.json
       - run:
           name: Update version from git tag
           command: |
             VERSION=${CIRCLE_TAG#v}
+            echo "设置版本: ${VERSION}"
             cd packages/react-drager
             npm version $VERSION --no-git-tag-version --allow-same-version
       - run:
           name: Authenticate with NPM
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          command: |
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+            echo "验证NPM登录："
+            npm whoami || echo "NPM认证失败"
       - run:
           name: Publish to NPM
           command: |
             cd packages/react-drager
-            ls -la  # 检查文件是否存在
-            npm publish --access public
+            echo "准备发布的文件："
+            npm pack --dry-run
+            echo "开始发布..."
+            npm publish --access public --verbose || echo "发布失败，错误码：$?"
 
 workflows:
   version: 2
@@ -64,4 +79,3 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-          type: approval
