@@ -13,18 +13,30 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages
+      - run:
+          name: Install bun
+          command: |
+            curl -fsSL https://bun.sh/install | bash
+            echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
+            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Build package
+          command: cd packages/react-drager && bun install && bun run build
       - run:
           name: Update version from git tag
           command: |
             VERSION=${CIRCLE_TAG#v}
+            cd packages/react-drager
             npm version $VERSION --no-git-tag-version --allow-same-version
       - run:
           name: Authenticate with NPM
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
           name: Publish to NPM
-          command: npm publish --access public
+          command: |
+            cd packages/react-drager
+            npm publish --access public
 
 workflows:
   version: 2
