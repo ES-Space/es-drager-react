@@ -1,7 +1,7 @@
 'use client'
-import type { AnchorPosition, AnchorProps } from '../types'
+import type { AnchorPosition, AnchorProps } from '../../types'
 import React, { useEffect, useRef, useState } from 'react'
-import './Anchor.css'
+import './index.css'
 
 export const Anchor: React.FC<AnchorProps> = ({ position, onDragStart, threshold = 10 }) => {
   const [isFlashing, setIsFlashing] = useState(false)

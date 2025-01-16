@@ -174,6 +174,26 @@ export function Examples() {
               </Drager>
             </div>
           </div>
+
+          <div className="bg-white rounded-lg p-8 shadow-sm">
+            <h3 className="text-sm font-medium mb-4">With Resize</h3>
+            <div className="h-[200px] relative border rounded-lg">
+              <Drager
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
+                resizable
+                style={{
+                  width: '128px',
+                  height: '128px',
+
+                }}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">Resizable Box</div>
+                  <div className="text-[10px] text-gray-400">Drag corners/edges to resize</div>
+                </div>
+              </Drager>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg p-8 shadow-sm mt-8">

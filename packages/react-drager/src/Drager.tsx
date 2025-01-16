@@ -1,7 +1,8 @@
-import type { AnchorPosition, Connection, DragerProps } from './types'
+import type { AnchorPosition, Connection, DragerProps, ResizePosition } from './types'
 import { RotateCw } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
-import { Anchor } from './components/Anchor'
+import { Anchor } from './components/anchor'
+import { ResizeHandle } from './components/resize-handle'
 import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
@@ -13,6 +14,7 @@ export const Drager: React.FC<DragerProps> = ({
   rotation = 0,
   rotatable = false,
   scalable = false,
+  resizable = false,
   minScale = 0.5,
   maxScale = 2,
   showGuides = false,
@@ -47,6 +49,9 @@ export const Drager: React.FC<DragerProps> = ({
   const startRotation = useRef({ angle: 0, rotation: 0 })
   const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null)
   const animationFrameId = useRef<number | null>(null)
+  const isResizing = useRef(false)
+  const resizeDirection = useRef<ResizePosition | null>(null)
+  const startDimensions = useRef({ width: 0, height: 0, left: 0, top: 0 })
 
   /**
    * handle the anchor drag event
@@ -177,6 +182,29 @@ export const Drager: React.FC<DragerProps> = ({
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  /**
+   * handle the resize start event
+   * @param position - the resize position
+   * @returns the mouse event
+   */
+  const handleResizeStart = (position: ResizePosition) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!contentRef.current)
+      return
+
+    isResizing.current = true
+    resizeDirection.current = position
+
+    const rect = contentRef.current.getBoundingClientRect()
+    startPos.current = { x: e.clientX, y: e.clientY }
+    startDimensions.current = {
+      width: rect.width,
+      height: rect.height,
+      left: currentPos.current.x,
+      top: currentPos.current.y,
+    }
   }
 
   useEffect(() => {
@@ -369,6 +397,61 @@ export const Drager: React.FC<DragerProps> = ({
           connectionManager?.updateConnections()
         })
       }
+
+      if (isResizing.current && contentRef.current && resizeDirection.current) {
+        const offsetX = e.clientX - startPos.current.x
+        const offsetY = e.clientY - startPos.current.y
+        const newDimensions = { ...startDimensions.current }
+
+        switch (resizeDirection.current) {
+          case 'right':
+            newDimensions.width += offsetX
+            break
+          case 'left':
+            newDimensions.width -= offsetX
+            newDimensions.left += offsetX
+            break
+          case 'bottom':
+            newDimensions.height += offsetY
+            break
+          case 'top':
+            newDimensions.height -= offsetY
+            newDimensions.top += offsetY
+            break
+          case 'top-right':
+            newDimensions.width += offsetX
+            newDimensions.height -= offsetY
+            newDimensions.top += offsetY
+            break
+          case 'top-left':
+            newDimensions.width -= offsetX
+            newDimensions.height -= offsetY
+            newDimensions.left += offsetX
+            newDimensions.top += offsetY
+            break
+          case 'bottom-right':
+            newDimensions.width += offsetX
+            newDimensions.height += offsetY
+            break
+          case 'bottom-left':
+            newDimensions.width -= offsetX
+            newDimensions.height += offsetY
+            newDimensions.left += offsetX
+            break
+        }
+
+        // Apply minimum dimensions
+        newDimensions.width = Math.max(newDimensions.width, 20)
+        newDimensions.height = Math.max(newDimensions.height, 20)
+
+        contentRef.current.style.width = `${newDimensions.width}px`
+        contentRef.current.style.height = `${newDimensions.height}px`
+        currentPos.current = {
+          x: newDimensions.left,
+          y: newDimensions.top,
+        }
+        updateTransform()
+      }
     }
 
     /**
@@ -388,6 +471,10 @@ export const Drager: React.FC<DragerProps> = ({
       }
       if (isRotating.current) {
         isRotating.current = false
+      }
+      if (isResizing.current) {
+        isResizing.current = false
+        resizeDirection.current = null
       }
     }
 
@@ -515,6 +602,18 @@ export const Drager: React.FC<DragerProps> = ({
         >
           <RotateCw style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
         </div>
+      )}
+      {resizable && (
+        <>
+          <ResizeHandle position="top" onMouseDown={handleResizeStart('top')} />
+          <ResizeHandle position="bottom" onMouseDown={handleResizeStart('bottom')} />
+          <ResizeHandle position="left" onMouseDown={handleResizeStart('left')} />
+          <ResizeHandle position="right" onMouseDown={handleResizeStart('right')} />
+          <ResizeHandle position="top-right" onMouseDown={handleResizeStart('top-right')} />
+          <ResizeHandle position="top-left" onMouseDown={handleResizeStart('top-left')} />
+          <ResizeHandle position="bottom-right" onMouseDown={handleResizeStart('bottom-right')} />
+          <ResizeHandle position="bottom-left" onMouseDown={handleResizeStart('bottom-left')} />
+        </>
       )}
     </div>
   )

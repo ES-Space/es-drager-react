@@ -31,6 +31,7 @@ function App() {
         拖拽我2
       </Drager>
       <Drager
+        id="drager3"
         className="w-32 h-32 bg-blue-500 cursor-move flex items-center justify-center text-white"
         onDragStart={() => console.log('drag start')}
         onDragEnd={() => console.log('drag end')}

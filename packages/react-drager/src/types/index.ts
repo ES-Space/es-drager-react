@@ -22,6 +22,8 @@ export interface DragerProps {
   rotatable?: boolean
   /** whether the element is scalable */
   scalable?: boolean
+  /** whether the element is resizable */
+  resizable?: boolean
   /** minimum scale of the element */
   minScale?: number
   /** maximum scale of the element */
@@ -70,4 +72,19 @@ export interface AnchorProps {
   threshold?: number
   // Whether to enter the range
   isInRange?: boolean
+}
+
+export type ResizePosition =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom-right'
+  | 'bottom-left'
+
+export interface ResizeHandleProps {
+  position: ResizePosition
+  onMouseDown: (e: React.MouseEvent) => void
 }
