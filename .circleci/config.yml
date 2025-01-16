@@ -1,70 +1,29 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
 orbs:
   node: circleci/node@5
+
 jobs:
-  build-node:
+  test:
     executor: node/default
     steps:
       - checkout
-      # 安装 bun
-      - run:
-          name: Install bun
-          command: |
-            curl -fsSL https://bun.sh/install | bash
-            echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
-            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
-            source $BASH_ENV
-      # 只构建包
-      - run:
-          name: Build package
-          command: cd packages/react-drager && bun install && bun run build
-      - persist_to_workspace:
-          root: .
-          paths:
-            - packages/react-drager/dist
-            - packages/react-drager/package.json
-            - packages/react-drager/README.md
-            - packages/react-drager/LICENSE
-
-  publish-npm:
-    executor: node/default
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-      - run:
-          name: Set version from GitHub Release
-          command: |
-            VERSION=${CIRCLE_TAG#v}
-            if [ -z "$VERSION" ]; then
-              echo "No version tag found"
-              exit 1
-            fi
-            echo "Publishing version: $VERSION"
-            cd packages/react-drager && npm version $VERSION --no-git-tag-version
-      - run:
-          name: Publish package
-          command: cd packages/react-drager && npm publish --access public
+      - run: echo "test"
 
 workflows:
   version: 2
-  release:
+  build-and-publish:
     jobs:
-      - build-node:
+      - test:
           filters:
+            branches:
+              only: main
             tags:
               only: /^v.*/
-            branches:
-              ignore: /.*/
       - publish-npm:
           requires:
-            - build-node
+            - test
           filters:
+            branches:
+              only: main
             tags:
               only: /^v.*/
-            branches:
-              ignore: /.*/
