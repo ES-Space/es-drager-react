@@ -308,9 +308,10 @@ export class ConnectionManager {
       sourcePos,
       targetPos,
       this.selectedConnection === connection,
+      connection.sourceAnchor,
+      connection.targetAnchor,
     )
 
-    // Add a click event
     path.addEventListener('click', (e) => {
       e.stopPropagation()
       this.selectedConnection = connection
@@ -327,13 +328,52 @@ export class ConnectionManager {
    * @param isSelected - whether the connection is selected
    * @returns the path element
    */
-  private createConnectionPath(start: { x: number, y: number }, end: { x: number, y: number }, isSelected = false) {
+  private createConnectionPath(
+    start: { x: number, y: number },
+    end: { x: number, y: number },
+    isSelected = false,
+    sourceAnchor?: string,
+    targetAnchor?: string,
+  ) {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    const offsetX = Math.abs(end.x - start.x) * 0.5
+
+    // the base offset
+    const baseOffset = 50
+    let c1x, c1y, c2x, c2y
+
+    // through the source and target anchor to adjust the control point
+    if (sourceAnchor && targetAnchor) {
+      if (sourceAnchor === 'left' || sourceAnchor === 'right') {
+        c1x = sourceAnchor === 'left' ? start.x - baseOffset : start.x + baseOffset
+        c1y = start.y
+      }
+      else {
+        c1x = start.x
+        c1y = sourceAnchor === 'top' ? start.y - baseOffset : start.y + baseOffset
+      }
+
+      if (targetAnchor === 'left' || targetAnchor === 'right') {
+        c2x = targetAnchor === 'left' ? end.x - baseOffset : end.x + baseOffset
+        c2y = end.y
+      }
+      else {
+        c2x = end.x
+        c2y = targetAnchor === 'top' ? end.y - baseOffset : end.y + baseOffset
+      }
+    }
+    else {
+      // the default behavior (for temporary connections)
+      const dx = end.x - start.x
+      const offset = Math.min(Math.abs(dx) * 0.5, baseOffset)
+      c1x = start.x + (dx > 0 ? offset : -offset)
+      c1y = start.y
+      c2x = end.x + (dx > 0 ? -offset : offset)
+      c2y = end.y
+    }
 
     const d = `M ${start.x} ${start.y} 
-               C ${start.x + offsetX} ${start.y},
-                 ${end.x - offsetX} ${end.y},
+               C ${c1x} ${c1y},
+                 ${c2x} ${c2y},
                  ${end.x} ${end.y}`
 
     path.setAttribute('d', d)
