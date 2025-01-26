@@ -396,21 +396,17 @@ export class ConnectionManager {
     }
   }
 
-  private debouncedUpdate = _.debounce(() => {
-    if (this.updateRAF) {
-      cancelAnimationFrame(this.updateRAF)
-    }
-    this.updateRAF = requestAnimationFrame(() => {
-      this.drawConnections()
-      this.updateRAF = null
-    })
-  }, 16)
-
   /**
    * update the connections
    */
   updateConnections() {
-    this.debouncedUpdate()
+      if (this.updateRAF) {
+          cancelAnimationFrame(this.updateRAF)
+      }
+      this.updateRAF = requestAnimationFrame(() => {
+          this.drawConnections()
+          this.updateRAF = null
+      })
   }
 
   /**
