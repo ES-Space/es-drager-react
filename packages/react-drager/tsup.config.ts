@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
@@ -6,14 +7,22 @@ export default defineConfig({
   dts: true,
   splitting: false,
   sourcemap: true,
-  clean: true,
+  clean: false,
   treeshake: true,
   minify: true,
   external: ['react'],
   esbuildOptions(options) {
     options.loader = {
       ...options.loader,
-      '.svg': 'dataurl', // 处理 SVG 文件
+      '.svg': 'dataurl', // handle svg
     }
+  },
+  onSuccess: async () => {
+    const files = ['dist/index.cjs.map', 'dist/index.js.map']
+    files.forEach((file) => {
+      if (fs.existsSync(file)) {
+        fs.unlinkSync(file)
+      }
+    })
   },
 })

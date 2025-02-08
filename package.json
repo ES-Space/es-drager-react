@@ -21,7 +21,6 @@
     "eslint": "^9.16.0",
     "open-cli": "^8.0.0",
     "prettier": "^3.2.5",
-    "rollup-plugin-visualizer": "^5.14.0",
     "turbo": "^2.3.3",
     "typescript": "5.5.4"
   },

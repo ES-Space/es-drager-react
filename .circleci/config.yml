@@ -16,7 +16,7 @@ jobs:
             source $BASH_ENV
       - run:
           name: Build package
-          command: cd packages/react-drager && bun install && bun run build
+          command: bun install && bun run build
       - persist_to_workspace:
           root: .
           paths:
