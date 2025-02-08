@@ -1,5 +1,5 @@
 import type { Connection } from '../types'
-import _ from 'lodash'
+import { throttle } from './utils'
 
 /**
  * ConnectionManager is a singleton class that manages the drawing of connections.
@@ -16,7 +16,7 @@ export class ConnectionManager {
   private updateRAF: number | null = null
 
   private boundHandleKeyDown: (e: KeyboardEvent) => void
-  private boundHandleMouseMove: ReturnType<typeof _.throttle>
+  private boundHandleMouseMove: ReturnType<typeof throttle>
   private boundHandleSvgClick: (e: MouseEvent) => void
 
   /**
@@ -24,7 +24,7 @@ export class ConnectionManager {
    */
   private constructor() {
     this.boundHandleKeyDown = this.handleKeyDown.bind(this)
-    this.boundHandleMouseMove = _.throttle(this.handleMouseMove.bind(this), 100)
+    this.boundHandleMouseMove = throttle(this.handleMouseMove.bind(this), 100)
     this.boundHandleSvgClick = this.handleSvgClick.bind(this)
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     this.initSVG()
@@ -400,13 +400,13 @@ export class ConnectionManager {
    * update the connections
    */
   updateConnections() {
-      if (this.updateRAF) {
-          cancelAnimationFrame(this.updateRAF)
-      }
-      this.updateRAF = requestAnimationFrame(() => {
-          this.drawConnections()
-          this.updateRAF = null
-      })
+    if (this.updateRAF) {
+      cancelAnimationFrame(this.updateRAF)
+    }
+    this.updateRAF = requestAnimationFrame(() => {
+      this.drawConnections()
+      this.updateRAF = null
+    })
   }
 
   /**

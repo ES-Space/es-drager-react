@@ -27,7 +27,6 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "LICENSE",
     "README.md",
     "dist"
   ],
@@ -40,11 +39,6 @@
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
-  },
-  "dependencies": {
-    "@types/lodash": "^4.17.14",
-    "lodash": "^4.17.21",
-    "lucide-react": "^0.263.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

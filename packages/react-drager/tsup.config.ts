@@ -10,8 +10,10 @@ export default defineConfig({
   treeshake: true,
   minify: true,
   external: ['react'],
-  injectStyle: true,
   esbuildOptions(options) {
-    options.jsx = 'automatic'
+    options.loader = {
+      ...options.loader,
+      '.svg': 'dataurl', // 处理 SVG 文件
+    }
   },
 })

@@ -1,8 +1,8 @@
 import type { AnchorPosition, Connection, DragerProps, ResizePosition } from './types'
-import { RotateCw } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { Anchor } from './components/anchor'
 import { ResizeHandle } from './components/resize-handle'
+import RotateIcon from './icons/rotate.svg'
 import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
@@ -600,7 +600,7 @@ export const Drager: React.FC<DragerProps> = ({
 
           }}
         >
-          <RotateCw style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+          <img src={RotateIcon} style={{ width: '16px', height: '16px' }} />
         </div>
       )}
       {resizable && (
