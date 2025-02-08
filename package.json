@@ -6,13 +6,12 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "turbo run build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "docs:dev": "concurrently \"turbo run dev --filter=docs -- --port 3001\" \"open-cli http://localhost:3001\"",
-    "docs:build": "turbo run build --filter=docs",
-    "analyze": "ANALYZE=true node scripts/build.js"
+    "docs:build": "turbo run build --filter=docs"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.11.2",

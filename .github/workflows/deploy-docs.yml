@@ -30,12 +30,12 @@ jobs:
         run: bun install
       
       - name: Build packages
-        run: bun run build
+        run: |
+          bun run build --filter="@es-space/es-drager-react"
       
       - name: Build docs
         run: |
           cd apps/docs
-          bun install
           bun run build
           touch out/.nojekyll
         env:
