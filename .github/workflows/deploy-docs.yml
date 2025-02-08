@@ -35,6 +35,7 @@ jobs:
       - name: Build docs
         run: |
           cd apps/docs
+          bun install
           bun run build
           touch out/.nojekyll
         env:
