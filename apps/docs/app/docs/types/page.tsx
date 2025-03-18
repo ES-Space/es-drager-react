@@ -22,6 +22,7 @@ export default function TypesPage() {
   // Feature flags
   rotatable?: boolean
   scalable?: boolean
+  resizable?: boolean
   connectable?: boolean
   showGuides?: boolean
   snapToElements?: boolean
@@ -36,6 +37,7 @@ export default function TypesPage() {
   minScale?: number
   maxScale?: number
   snapThreshold?: number
+  rotation?: number
 
   // Event handlers
   onDragStart?: () => void
@@ -43,12 +45,7 @@ export default function TypesPage() {
   onDragEnd?: () => void
   onRotate?: (angle: number) => void
   onScale?: (scale: number) => void
-  onConnect?: (
-    sourceId: string,
-    sourceAnchor: string,
-    targetId: string,
-    targetAnchor: string
-  ) => void
+  onConnect?: (connection: Connection) => void
 }`}
         </code>
       </pre>
@@ -62,9 +59,9 @@ export default function TypesPage() {
         <code className="language-typescript">
           {`interface Connection {
   sourceId: string
-  sourceAnchor: string
+  sourceAnchor: AnchorPosition
   targetId: string
-  targetAnchor: string
+  targetAnchor: AnchorPosition
 }`}
         </code>
       </pre>
@@ -80,6 +77,17 @@ export default function TypesPage() {
         </code>
       </pre>
 
+      <h2>ResizePosition</h2>
+      <p>
+        Valid positions for resize handles.
+      </p>
+
+      <pre>
+        <code className="language-typescript">
+          {`type ResizePosition = 'top' | 'right' | 'bottom' | 'left' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'`}
+        </code>
+      </pre>
+
       <h2>Usage Example</h2>
       <p>
         Here's how to use these types in your TypeScript code:
@@ -92,12 +100,8 @@ import type { DragerProps, Connection, AnchorPosition } from '@es-space/es-drage
 
 // Using the component with TypeScript
 function MyComponent() {
-  const handleConnect = (
-    sourceId: string,
-    sourceAnchor: AnchorPosition,
-    targetId: string,
-    targetAnchor: AnchorPosition
-  ) => {
+  const handleConnect = (connection: Connection) => {
+    const { sourceId, sourceAnchor, targetId, targetAnchor } = connection
     // Handle connection
   }
 
@@ -106,7 +110,10 @@ function MyComponent() {
       id="my-drager"
       rotatable
       scalable
+      resizable
       connectable
+      showGuides
+      limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
       onConnect={handleConnect}
     >
       Content

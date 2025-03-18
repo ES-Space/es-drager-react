@@ -16,8 +16,8 @@ export function IntroductionContent() {
       <h2>Overview</h2>
 
       <p>
-        ES Drager provides a simple yet powerful way to add drag, rotate, and scale functionality to any React component.
-        With built-in support for connections, alignment guides, and snapping, it's perfect for building:
+        ES Drager provides a simple yet powerful way to add drag, rotate, scale, and resize functionality to any React component.
+        With built-in support for connections, alignment guides, position constraints, and snapping, it's perfect for building:
       </p>
 
       <ul>
@@ -25,6 +25,8 @@ export function IntroductionContent() {
         <li>Visual builders</li>
         <li>Interactive interfaces</li>
         <li>Layout tools</li>
+        <li>Flow charts</li>
+        <li>Design tools</li>
       </ul>
 
       <h2>Interactive Demo</h2>
@@ -36,6 +38,7 @@ export function IntroductionContent() {
             style={{ left: '50px', top: '20px' }}
             rotatable
             scalable
+            resizable
           >
             Basic
           </Drager>
@@ -44,6 +47,7 @@ export function IntroductionContent() {
             className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
             style={{ left: '150px', top: '20px' }}
             connectable
+            limit={{ minX: 100, maxX: 400, minY: 0, maxY: 300 }}
           >
             Connections
           </Drager>
@@ -53,7 +57,9 @@ export function IntroductionContent() {
             style={{ left: '250px', top: '20px' }}
             rotatable
             scalable
+            resizable
             connectable
+            showGuides
           >
             Try me!
           </Drager>
@@ -72,7 +78,13 @@ function App() {
       className="w-32 h-32 bg-blue-500"
       rotatable
       scalable
+      resizable
       connectable
+      showGuides
+      limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
+      onConnect={({ sourceId, sourceAnchor, targetId, targetAnchor }) => {
+        console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
+      }}
     >
       Try me!
     </Drager>
@@ -102,6 +114,10 @@ function App() {
           Explore advanced features like
           {' '}
           <a href={`${BASE_PATH}/docs/connections`}>connections</a>
+          {' '}
+          and
+          {' '}
+          <a href={`${BASE_PATH}/docs/props`}>position constraints</a>
         </li>
       </ul>
     </div>

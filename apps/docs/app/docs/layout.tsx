@@ -19,6 +19,7 @@ const sidebar = [
       { href: '/docs/dragging', label: 'Dragging' },
       { href: '/docs/rotation', label: 'Rotation' },
       { href: '/docs/scaling', label: 'Scaling' },
+      { href: '/docs/resize', label: 'Resize' },
       { href: '/docs/connections', label: 'Connections' },
     ],
   },

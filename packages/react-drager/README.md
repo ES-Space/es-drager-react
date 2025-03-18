@@ -13,10 +13,13 @@
 - 🎯 Drag & drop with constraints
 - 🔄 Rotation support
 - ⚖️ Scale with mouse wheel
+- 📏 Resize handles for manual resizing
 - 🔗 Connection points with bezier curves
 - 📏 Snap to grid & alignment guides
 - 🎨 Tailwind CSS styling
 - 🎮 Rich interaction events
+- 🔒 Position limits and constraints
+- 🎯 Precise anchor point connections
 
 ## 📦 Installation
 
@@ -59,14 +62,18 @@ function App() {
 | style | CSSProperties | - | Inline styles |
 | rotatable | boolean | false | Enable rotation |
 | scalable | boolean | false | Enable scaling |
+| resizable | boolean | false | Enable manual resizing with handles |
 | minScale | number | 0.5 | Minimum scale value |
 | maxScale | number | 2 | Maximum scale value |
 | showGuides | boolean | false | Show alignment guides |
 | snapToElements | boolean | false | Enable snapping to other elements |
 | snapThreshold | number | 5 | Snapping threshold in pixels |
 | connectable | boolean | false | Enable connection points |
-| limit | Object | - | Movement constraints |
+| limit | { minX?: number; maxX?: number; minY?: number; maxY?: number } | - | Movement constraints |
+| rotation | number | 0 | Initial rotation angle |
+| onDragStart | function | - | Drag start event handler |
 | onDrag | function | - | Drag event handler |
+| onDragEnd | function | - | Drag end event handler |
 | onRotate | function | - | Rotation event handler |
 | onScale | function | - | Scale event handler |
 | onConnect | function | - | Connection event handler |
@@ -117,6 +124,28 @@ function App() {
   }}
 >
   Connectable element
+</Drager>
+```
+
+### With Resizing
+
+```tsx
+<Drager
+  className="w-32 h-32 bg-blue-500"
+  resizable
+>
+  Resizable element
+</Drager>
+```
+
+### With Position Limits
+
+```tsx
+<Drager
+  className="w-32 h-32 bg-blue-500"
+  limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
+>
+  Element with movement constraints
 </Drager>
 ```
 
