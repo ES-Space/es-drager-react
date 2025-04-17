@@ -33,10 +33,10 @@ export function Examples() {
 
       const { width, height } = container.contentRect
 
-      // 更新拖拽边界
+      // update the draggable boundary
       setBounds({
-        maxX: width - 96, // Drager 宽度 (96px)
-        maxY: height - 96, // Drager 高度
+        maxX: width - 96, // Drager width (96px)
+        maxY: height - 96, // Drager height
       })
     })
 
@@ -50,13 +50,21 @@ export function Examples() {
   }
 
   return (
-    <div className="flex-1 p-8 bg-gray-50">
-      <div className="max-w-screen-xl mx-auto p-8">
+    <div className="flex-1 p-8 relative">
+      <div className="absolute inset-0 bg-white">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#d1d5db_1px,transparent_1px),linear-gradient(to_bottom,#d1d5db_1px,transparent_1px)] bg-[size:32px_32px] opacity-50" />
+        <div className="absolute inset-0 bg-white/60" />
+      </div>
+      <div className="relative max-w-screen-xl mx-auto p-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">Basic Usage</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 relative bg-white"
               >
                 <div className="flex items-center justify-center h-full text-blue-500">
@@ -68,7 +76,7 @@ export function Examples() {
 
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Constraints</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <div
                 ref={containerRef}
                 className="absolute inset-4 border-2 border-dashed border-gray-200"
@@ -77,6 +85,7 @@ export function Examples() {
                   Draggable Area
                 </div>
                 <Drager
+
                   className="w-24 h-24 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                   limit={{
                     minX: 0,
@@ -96,8 +105,12 @@ export function Examples() {
 
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Rotation</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                 rotatable
               >
@@ -113,8 +126,12 @@ export function Examples() {
         <div className="grid grid-cols-3 gap-8 mt-8">
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Scale</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                 scalable
                 minScale={0.5}
@@ -130,8 +147,12 @@ export function Examples() {
 
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Guidelines</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
                 showGuides
               >
@@ -145,8 +166,12 @@ export function Examples() {
 
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Snapping</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500"
                 snapToElements
                 snapThreshold={5}
@@ -159,13 +184,13 @@ export function Examples() {
               </Drager>
 
               <Drager
+                style={{
+                  right: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-green-500"
                 snapToElements
                 snapThreshold={5}
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                }}
               >
                 <div className="flex flex-col items-center justify-center h-full gap-1">
                   <div className="text-xs font-medium text-green-500">Snap Box 2</div>
@@ -177,14 +202,15 @@ export function Examples() {
 
           <div className="bg-white rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">With Resize</h3>
-            <div className="h-[200px] relative border rounded-lg">
+            <div className="h-[200px] relative border rounded-lg overflow-hidden">
               <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
                 className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500 text-center"
                 resizable
-                style={{
-                  width: '128px',
-                  height: '128px',
-                }}
+
               >
                 <div className="flex flex-col items-center justify-center w-full gap-1">
                   <div className="text-xs font-medium">Resizable Box</div>
@@ -200,9 +226,10 @@ export function Examples() {
           <div className="text-xs text-gray-500 mb-4">
             Hover over the blue dots and drag to another dot to create a connection
           </div>
-          <div className="h-[200px] relative border rounded-lg">
+          <div className="h-[200px] relative border rounded-lg overflow-hidden">
             {dragers.map((drager, idx) => (
               <Drager
+
                 key={idx}
                 id={drager.id}
                 className="w-32 h-32 border-2 border-dashed border-blue-500"
@@ -210,7 +237,7 @@ export function Examples() {
                 onConnect={handleConnect}
                 style={{
                   position: 'absolute',
-                  left: drager.x - 100,
+                  left: drager.x - 80,
                   top: drager.y - 10,
                 }}
               >

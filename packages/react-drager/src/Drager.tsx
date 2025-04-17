@@ -43,13 +43,13 @@ export const Drager: React.FC<DragerProps> = ({
   const currentRotation = useRef(rotation)
   const isDragging = useRef(false)
   const isRotating = useRef(false)
+  const isResizing = useRef(false)
   const currentScale = useRef(1)
   const connectingAnchor = useRef<AnchorPosition | null>(null)
   const currentMousePos = useRef({ x: 0, y: 0 })
   const startRotation = useRef({ angle: 0, rotation: 0 })
   const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null)
   const animationFrameId = useRef<number | null>(null)
-  const isResizing = useRef(false)
   const resizeDirection = useRef<ResizePosition | null>(null)
   const startDimensions = useRef({ width: 0, height: 0, left: 0, top: 0 })
 
@@ -281,7 +281,7 @@ export const Drager: React.FC<DragerProps> = ({
     }
 
     /**
-     * handle the mouse down event
+     * handle the mouse down event(start dragging)
      * @param e - the mouse event
      */
     const handleMouseDown = (e: MouseEvent) => {
@@ -297,32 +297,11 @@ export const Drager: React.FC<DragerProps> = ({
     }
 
     /**
-     * handle the mouse move event
+     * handle the mouse move event(dragging)
      * @param e - the mouse event
      */
     const handleMouseMove = (e: MouseEvent) => {
       currentMousePos.current = { x: e.clientX, y: e.clientY }
-
-      if (isRotating.current && content) {
-        const rect = content.getBoundingClientRect()
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-
-        const currentAngle = Math.atan2(
-          e.clientY - centerY,
-          e.clientX - centerX,
-        ) * 180 / Math.PI
-
-        // calculate angle difference and update rotation
-        const angleDiff = currentAngle - startRotation.current.angle
-        currentRotation.current = startRotation.current.rotation + angleDiff
-
-        updateTransform()
-        onRotate?.(currentRotation.current)
-        const connectionManager = ConnectionManager.getInstance()
-        connectionManager?.updateConnections()
-        return
-      }
 
       if (isDragging.current) {
         const newPos = {
@@ -377,7 +356,7 @@ export const Drager: React.FC<DragerProps> = ({
         connectionManager?.updateConnections()
       }
 
-      if (isRotating.current) {
+      if (isRotating.current && content) {
         const rect = content.getBoundingClientRect()
         const centerX = rect.left + rect.width / 2
         const centerY = rect.top + rect.height / 2
@@ -455,7 +434,7 @@ export const Drager: React.FC<DragerProps> = ({
     }
 
     /**
-     * handle the mouse up event
+     * handle the mouse up event(stop dragging)
      */
     const handleMouseUp = () => {
       if (isDragging.current) {
@@ -557,7 +536,7 @@ export const Drager: React.FC<DragerProps> = ({
         anchor.removeEventListener('mousedown', listener)
       })
     }
-  }, [limit, onDrag, onDragEnd, onDragStart, onRotate, onScale, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, onConnect, mousePos])
+  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos])
 
   return (
     <div

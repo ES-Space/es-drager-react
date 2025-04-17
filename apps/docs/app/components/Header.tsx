@@ -22,8 +22,22 @@ export function Header() {
 
   return (
     <header className="h-14 border-b flex items-center px-4 bg-white z-10">
+      <style jsx>
+        {`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.3); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.3); }
+          70% { transform: scale(1); }
+        }
+        .heartbeat-dot {
+          animation: heartbeat 1.5s ease-in-out infinite;
+        }
+      `}
+      </style>
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-blue-500" />
+        <div className="w-2 h-2 rounded-full bg-blue-500 heartbeat-dot" />
         <h1 className="text-sm font-medium">ES Drager</h1>
       </div>
 
