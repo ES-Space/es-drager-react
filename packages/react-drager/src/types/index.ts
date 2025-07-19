@@ -9,6 +9,8 @@ export interface DragerProps {
   className?: string
   /** style to be applied to the element */
   style?: React.CSSProperties
+  /** whether the element is draggable */
+  draggable?: boolean
   /** limit the movement of the element */
   limit?: {
     minX?: number

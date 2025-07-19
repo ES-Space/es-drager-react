@@ -7,6 +7,7 @@ function App() {
       <Drager
         id="drager1"
         className="w-32 h-32 bg-blue-500 cursor-move flex items-center justify-center text-white"
+        draggable={false}
         onDragStart={() => console.log('drag start')}
         onDragEnd={() => console.log('drag end')}
         onDrag={(e) => console.log('dragging:', e.x, e.y)}

@@ -10,6 +10,7 @@ export const Drager: React.FC<DragerProps> = ({
   children,
   className,
   style,
+  draggable = true,
   limit,
   rotation = 0,
   rotatable = false,
@@ -285,6 +286,8 @@ export const Drager: React.FC<DragerProps> = ({
      * @param e - the mouse event
      */
     const handleMouseDown = (e: MouseEvent) => {
+      if (!draggable)
+        return
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
       e.preventDefault()
@@ -547,7 +550,7 @@ export const Drager: React.FC<DragerProps> = ({
       style={{
         position: 'absolute',
         userSelect: 'none',
-        cursor: 'move',
+        cursor: draggable ? 'move' : 'default',
         transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
         ...style,
       }}
