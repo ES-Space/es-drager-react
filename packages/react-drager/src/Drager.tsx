@@ -10,7 +10,17 @@ export const Drager: React.FC<DragerProps> = ({
   children,
   className,
   style,
+  selected = false,
+  disabled = false,
   draggable = true,
+  width,
+  height,
+  top = 0,
+  left = 0,
+  minWidth = 20,
+  minHeight = 20,
+  maxWidth,
+  maxHeight,
   limit,
   rotation = 0,
   rotatable = false,
@@ -22,6 +32,8 @@ export const Drager: React.FC<DragerProps> = ({
   snapThreshold = 5,
   snapToElements = false,
   connectable = false,
+  onBlur,
+  onClick,
   onDragStart,
   onDragEnd,
   onDrag,
@@ -38,8 +50,8 @@ export const Drager: React.FC<DragerProps> = ({
   const rotateHandleRef = useRef<HTMLDivElement>(null)
   const startPos = useRef({ x: 0, y: 0 })
   const currentPos = useRef({
-    x: style?.left ? Number.parseInt(style.left as string) : 0,
-    y: style?.top ? Number.parseInt(style.top as string) : 0,
+    x: left ?? (style?.left ? Number.parseInt(style.left as string) : 0),
+    y: top ?? (style?.top ? Number.parseInt(style.top as string) : 0),
   })
   const currentRotation = useRef(rotation)
   const isDragging = useRef(false)
@@ -53,6 +65,27 @@ export const Drager: React.FC<DragerProps> = ({
   const animationFrameId = useRef<number | null>(null)
   const resizeDirection = useRef<ResizePosition | null>(null)
   const startDimensions = useRef({ width: 0, height: 0, left: 0, top: 0 })
+
+  /**
+   * update the transform of the element
+   */
+  const updateTransform = () => {
+    if (contentRef.current) {
+      contentRef.current.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
+    }
+  }
+
+  useEffect(() => {
+    // initialize the position and size
+    if (contentRef.current) {
+      if (width)
+        contentRef.current.style.width = `${width}px`
+      if (height)
+        contentRef.current.style.height = `${height}px`
+      currentPos.current = { x: left, y: top }
+      updateTransform()
+    }
+  }, [width, height, left, top])
 
   /**
    * handle the anchor drag event
@@ -191,6 +224,8 @@ export const Drager: React.FC<DragerProps> = ({
    * @returns the mouse event
    */
   const handleResizeStart = (position: ResizePosition) => (e: React.MouseEvent) => {
+    if (disabled)
+      return
     e.stopPropagation()
     if (!contentRef.current)
       return
@@ -229,13 +264,6 @@ export const Drager: React.FC<DragerProps> = ({
         x: Math.min(Math.max(pos.x, limit.minX ?? -Infinity), limit.maxX ?? Infinity),
         y: Math.min(Math.max(pos.y, limit.minY ?? -Infinity), limit.maxY ?? Infinity),
       }
-    }
-
-    /**
-     * update the transform of the element
-     */
-    const updateTransform = () => {
-      content.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
     }
 
     /**
@@ -286,7 +314,7 @@ export const Drager: React.FC<DragerProps> = ({
      * @param e - the mouse event
      */
     const handleMouseDown = (e: MouseEvent) => {
-      if (!draggable)
+      if (disabled || !draggable)
         return
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
@@ -426,6 +454,16 @@ export const Drager: React.FC<DragerProps> = ({
         newDimensions.width = Math.max(newDimensions.width, 20)
         newDimensions.height = Math.max(newDimensions.height, 20)
 
+        // Apply size constraints
+        newDimensions.width = Math.min(
+          Math.max(newDimensions.width, minWidth),
+          maxWidth ?? Infinity,
+        )
+        newDimensions.height = Math.min(
+          Math.max(newDimensions.height, minHeight),
+          maxHeight ?? Infinity,
+        )
+
         contentRef.current.style.width = `${newDimensions.width}px`
         contentRef.current.style.height = `${newDimensions.height}px`
         currentPos.current = {
@@ -442,7 +480,7 @@ export const Drager: React.FC<DragerProps> = ({
     const handleMouseUp = () => {
       if (isDragging.current) {
         isDragging.current = false
-        onDragEnd?.()
+        onDragEnd?.(currentPos.current)
         if (content) {
           content.style.willChange = ''
         }
@@ -539,21 +577,32 @@ export const Drager: React.FC<DragerProps> = ({
         anchor.removeEventListener('mousedown', listener)
       })
     }
-  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos])
+  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, width, height, left, top, minWidth, minHeight, maxWidth, maxHeight])
+
+  const handleClick = (_: React.MouseEvent) => {
+    if (disabled)
+      return
+    onClick?.()
+  }
 
   return (
     <div
       ref={contentRef}
       data-drager
       data-drager-id={id}
-      className={className}
+      className={`${className ?? ''} ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''}`}
       style={{
         position: 'absolute',
         userSelect: 'none',
-        cursor: draggable ? 'move' : 'default',
+        cursor: disabled ? 'not-allowed' : (draggable ? 'move' : 'default'),
         transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
+        opacity: disabled ? 0.6 : 1,
+        width: width ? `${width}px` : undefined,
+        height: height ? `${height}px` : undefined,
         ...style,
       }}
+      onClick={handleClick}
+      onBlur={onBlur}
     >
       {connectable && (
         <>
@@ -587,14 +636,14 @@ export const Drager: React.FC<DragerProps> = ({
       )}
       {resizable && (
         <>
-          <ResizeHandle position="top" onMouseDown={handleResizeStart('top')} />
-          <ResizeHandle position="bottom" onMouseDown={handleResizeStart('bottom')} />
-          <ResizeHandle position="left" onMouseDown={handleResizeStart('left')} />
-          <ResizeHandle position="right" onMouseDown={handleResizeStart('right')} />
-          <ResizeHandle position="top-right" onMouseDown={handleResizeStart('top-right')} />
-          <ResizeHandle position="top-left" onMouseDown={handleResizeStart('top-left')} />
-          <ResizeHandle position="bottom-right" onMouseDown={handleResizeStart('bottom-right')} />
-          <ResizeHandle position="bottom-left" onMouseDown={handleResizeStart('bottom-left')} />
+          <ResizeHandle position="top" onMouseDown={e => handleResizeStart('top')(e)} />
+          <ResizeHandle position="bottom" onMouseDown={e => handleResizeStart('bottom')(e)} />
+          <ResizeHandle position="left" onMouseDown={e => handleResizeStart('left')(e)} />
+          <ResizeHandle position="right" onMouseDown={e => handleResizeStart('right')(e)} />
+          <ResizeHandle position="top-right" onMouseDown={e => handleResizeStart('top-right')(e)} />
+          <ResizeHandle position="top-left" onMouseDown={e => handleResizeStart('top-left')(e)} />
+          <ResizeHandle position="bottom-right" onMouseDown={e => handleResizeStart('bottom-right')(e)} />
+          <ResizeHandle position="bottom-left" onMouseDown={e => handleResizeStart('bottom-left')(e)} />
         </>
       )}
     </div>

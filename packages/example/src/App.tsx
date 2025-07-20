@@ -1,47 +1,85 @@
 import { Drager } from '@es-space/es-drager-react'
+import { useState } from 'react'
 
-// test
 function App() {
+  const [selected1, setSelected1] = useState(false)
+  const [disabled1, setDisabled1] = useState(false)
+
   return (
-    <div className="w-screen h-screen p-8">
+    <div>
+      {/* test selected, disabled, draggable, width/height, top/left */}
       <Drager
         id="drager1"
-        className="w-32 h-32 bg-blue-500 cursor-move flex items-center justify-center text-white"
-        draggable={false}
+        className="bg-blue-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
+        selected={selected1}
+        disabled={disabled1}
+        draggable={!disabled1}
+        width={200}
+        height={150}
+        top={100}
+        left={100}
+        minWidth={100}
+        minHeight={100}
+        maxWidth={300}
+        maxHeight={250}
+        onClick={() => setSelected1(true)}
+        onBlur={() => {
+          setSelected1(false)
+          setDisabled1(false)
+        }}
         onDragStart={() => console.log('drag start')}
-        onDragEnd={() => console.log('drag end')}
-        onDrag={(e) => console.log('dragging:', e.x, e.y)}
+        onDragEnd={(pos: { x: number, y: number }) => console.log('drag end at:', pos)}
+        onDrag={(pos) => console.log('dragging:', pos)}
         connectable
-        onConnect={() => console.log('connect')}
-        snapToElements
-        snapThreshold={10}
+        resizable
+        rotatable
       >
-        拖拽我1
+        <div className="absolute top-0 left-0 w-full bg-black/50 text-white text-sm px-2 py-1 border-b border-white">
+          resizable
+        </div>
+        <div>Drager 1</div>
       </Drager>
+
+      {/* test snapToElements */}
       <Drager
         id="drager2"
-        className="w-32 h-32 bg-blue-500 cursor-move flex items-center justify-center text-white"
+        className="bg-green-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
+        width={150}
+        height={150}
+        top={300}
+        left={300}
         onDragStart={() => console.log('drag start')}
-        onDragEnd={() => console.log('drag end')}
-        onDrag={(e) => console.log('dragging:', e.x, e.y)}
+        onDragEnd={(pos: { x: number, y: number }) => console.log('drag end at:', pos)}
+        onDrag={(pos) => console.log('dragging:', pos)}
         connectable
-        onConnect={() => console.log('connect')}
         snapToElements
         snapThreshold={10}
       >
-        拖拽我2
+        <div className="absolute top-0 left-0 w-full bg-black/50 text-white text-sm px-2 py-1 border-b border-white">
+          snapToElements
+        </div>
+        <div>Drager 2</div>
       </Drager>
+
+      {/* test showGuides */}
       <Drager
         id="drager3"
-        className="w-32 h-32 bg-blue-500 cursor-move flex items-center justify-center text-white"
+        className="bg-purple-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
+        width={120}
+        height={120}
+        top={500}
+        left={150}
         onDragStart={() => console.log('drag start')}
-        onDragEnd={() => console.log('drag end')}
-        onDrag={(e) => console.log('dragging:', e.x, e.y)}
+        onDragEnd={(pos: { x: number, y: number }) => console.log('drag end at:', pos)}
+        onDrag={(pos) => console.log('dragging:', pos)}
         showGuides
         connectable
         onConnect={() => console.log('connect')}
       >
-        拖拽我3
+        <div className="absolute top-0 left-0 w-full bg-black/50 text-white text-sm px-2 py-1 border-b border-white">
+          showGuides
+        </div>
+        <div>Drager 3</div>
       </Drager>
     </div>
   )

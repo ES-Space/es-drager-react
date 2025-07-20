@@ -9,8 +9,28 @@ export interface DragerProps {
   className?: string
   /** style to be applied to the element */
   style?: React.CSSProperties
+  /** whether the element is selected */
+  selected?: boolean
+  /** whether the element is disabled */
+  disabled?: boolean
   /** whether the element is draggable */
   draggable?: boolean
+  /** width of the element */
+  width?: number
+  /** height of the element */
+  height?: number
+  /** top position of the element */
+  top?: number
+  /** left position of the element */
+  left?: number
+  /** minimum width of the element */
+  minWidth?: number
+  /** minimum height of the element */
+  minHeight?: number
+  /** maximum width of the element */
+  maxWidth?: number
+  /** maximum height of the element */
+  maxHeight?: number
   /** limit the movement of the element */
   limit?: {
     minX?: number
@@ -38,10 +58,14 @@ export interface DragerProps {
   snapToElements?: boolean
   /** whether to connectable */
   connectable?: boolean
+  /** callback when element loses focus */
+  onBlur?: () => void
+  /** callback when element is clicked */
+  onClick?: () => void
   /** callback when dragging starts */
   onDragStart?: () => void
   /** callback when dragging ends */
-  onDragEnd?: () => void
+  onDragEnd?: (position: { x: number, y: number }) => void
   /** callback when dragging */
   onDrag?: (position: { x: number, y: number }) => void
   /** callback when rotating */
