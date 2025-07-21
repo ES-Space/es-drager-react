@@ -40,6 +40,7 @@ export const Drager: React.FC<DragerProps> = ({
   onRotate,
   onScale,
   onConnect,
+  onResize,
 }) => {
   /** id is required when connectable is true */
   if (connectable && !id) {
@@ -471,6 +472,7 @@ export const Drager: React.FC<DragerProps> = ({
           y: newDimensions.top,
         }
         updateTransform()
+        onResize?.({ width: newDimensions.width, height: newDimensions.height })
       }
     }
 

@@ -74,6 +74,8 @@ export interface DragerProps {
   onScale?: (scale: number) => void
   /** callback when connecting */
   onConnect?: (connection: Connection) => void
+  /** callback when resizing */
+  onResize?: (size: { width: number, height: number }) => void
 }
 
 /** anchor position */

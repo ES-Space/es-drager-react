@@ -30,6 +30,7 @@ function App() {
         onDragStart={() => console.log('drag start')}
         onDragEnd={(pos: { x: number, y: number }) => console.log('drag end at:', pos)}
         onDrag={(pos) => console.log('dragging:', pos)}
+        onResize={(size) => console.log('resizing:', size)}
         connectable
         resizable
         rotatable
