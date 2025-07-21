@@ -13,14 +13,8 @@ export const Drager: React.FC<DragerProps> = ({
   selected = false,
   disabled = false,
   draggable = true,
-  width,
-  height,
   top = 0,
   left = 0,
-  minWidth = 20,
-  minHeight = 20,
-  maxWidth,
-  maxHeight,
   limit,
   rotation = 0,
   rotatable = false,
@@ -79,14 +73,10 @@ export const Drager: React.FC<DragerProps> = ({
   useEffect(() => {
     // initialize the position and size
     if (contentRef.current) {
-      if (width)
-        contentRef.current.style.width = `${width}px`
-      if (height)
-        contentRef.current.style.height = `${height}px`
       currentPos.current = { x: left, y: top }
       updateTransform()
     }
-  }, [width, height, left, top])
+  }, [left, top])
 
   /**
    * handle the anchor drag event
@@ -455,14 +445,20 @@ export const Drager: React.FC<DragerProps> = ({
         newDimensions.width = Math.max(newDimensions.width, 20)
         newDimensions.height = Math.max(newDimensions.height, 20)
 
-        // Apply size constraints
+        // Apply size constraints from style prop if provided
+        const computedStyle = window.getComputedStyle(contentRef.current)
+        const minWidth = Number.parseInt(computedStyle.minWidth) || 20
+        const minHeight = Number.parseInt(computedStyle.minHeight) || 20
+        const maxWidth = Number.parseInt(computedStyle.maxWidth) || Infinity
+        const maxHeight = Number.parseInt(computedStyle.maxHeight) || Infinity
+
         newDimensions.width = Math.min(
           Math.max(newDimensions.width, minWidth),
-          maxWidth ?? Infinity,
+          maxWidth,
         )
         newDimensions.height = Math.min(
           Math.max(newDimensions.height, minHeight),
-          maxHeight ?? Infinity,
+          maxHeight,
         )
 
         contentRef.current.style.width = `${newDimensions.width}px`
@@ -579,7 +575,7 @@ export const Drager: React.FC<DragerProps> = ({
         anchor.removeEventListener('mousedown', listener)
       })
     }
-  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, width, height, left, top, minWidth, minHeight, maxWidth, maxHeight])
+  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, top, left])
 
   const handleClick = (_: React.MouseEvent) => {
     if (disabled)
@@ -599,8 +595,6 @@ export const Drager: React.FC<DragerProps> = ({
         cursor: disabled ? 'not-allowed' : (draggable ? 'move' : 'default'),
         transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
         opacity: disabled ? 0.6 : 1,
-        width: width ? `${width}px` : undefined,
-        height: height ? `${height}px` : undefined,
         ...style,
       }}
       onClick={handleClick}

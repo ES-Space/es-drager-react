@@ -7,21 +7,23 @@ function App() {
 
   return (
     <div>
-      {/* test selected, disabled, draggable, width/height, top/left */}
+      {/* test selected, disabled, draggable, style, top/left */}
       <Drager
         id="drager1"
         className="bg-blue-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
         selected={selected1}
         disabled={disabled1}
         draggable={!disabled1}
-        width={200}
-        height={150}
+        style={{
+          width: '200px',
+          height: '150px',
+          minWidth: '100px',
+          minHeight: '100px',
+          maxWidth: '300px',
+          maxHeight: '250px'
+        }}
         top={100}
         left={100}
-        minWidth={100}
-        minHeight={100}
-        maxWidth={300}
-        maxHeight={250}
         onClick={() => setSelected1(true)}
         onBlur={() => {
           setSelected1(false)
@@ -45,8 +47,10 @@ function App() {
       <Drager
         id="drager2"
         className="bg-green-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
-        width={150}
-        height={150}
+        style={{
+          width: '150px',
+          height: '150px'
+        }}
         top={300}
         left={300}
         onDragStart={() => console.log('drag start')}
@@ -66,8 +70,10 @@ function App() {
       <Drager
         id="drager3"
         className="bg-purple-500 flex flex-col items-center justify-center text-white relative border-2 border-blue-500 rounded"
-        width={120}
-        height={120}
+        style={{
+          width: '120px',
+          height: '120px'
+        }}
         top={500}
         left={150}
         onDragStart={() => console.log('drag start')}

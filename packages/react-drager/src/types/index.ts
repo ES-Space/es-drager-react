@@ -15,22 +15,10 @@ export interface DragerProps {
   disabled?: boolean
   /** whether the element is draggable */
   draggable?: boolean
-  /** width of the element */
-  width?: number
-  /** height of the element */
-  height?: number
   /** top position of the element */
   top?: number
   /** left position of the element */
   left?: number
-  /** minimum width of the element */
-  minWidth?: number
-  /** minimum height of the element */
-  minHeight?: number
-  /** maximum width of the element */
-  maxWidth?: number
-  /** maximum height of the element */
-  maxHeight?: number
   /** limit the movement of the element */
   limit?: {
     minX?: number
