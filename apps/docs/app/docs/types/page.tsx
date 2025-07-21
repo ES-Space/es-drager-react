@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 export default function TypesPage() {
   return (
     <div className="prose prose-blue max-w-none">
@@ -18,6 +20,19 @@ export default function TypesPage() {
   children: React.ReactNode
   className?: string
   style?: React.CSSProperties
+  selected?: boolean
+  disabled?: boolean
+  draggable?: boolean
+
+  // Dimension props
+  width?: number
+  height?: number
+  top?: number
+  left?: number
+  minWidth?: number
+  minHeight?: number
+  maxWidth?: number
+  maxHeight?: number
 
   // Feature flags
   rotatable?: boolean
@@ -40,11 +55,14 @@ export default function TypesPage() {
   rotation?: number
 
   // Event handlers
+  onClick?: () => void
+  onBlur?: () => void
   onDragStart?: () => void
   onDrag?: (position: { x: number; y: number }) => void
-  onDragEnd?: () => void
-  onRotate?: (angle: number) => void
+  onDragEnd?: (position: { x: number; y: number }) => void
+  onRotate?: (rotation: number) => void
   onScale?: (scale: number) => void
+  onResize?: (size: { width: number; height: number }) => void
   onConnect?: (connection: Connection) => void
 }`}
         </code>
@@ -84,7 +102,15 @@ export default function TypesPage() {
 
       <pre>
         <code className="language-typescript">
-          {`type ResizePosition = 'top' | 'right' | 'bottom' | 'left' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'`}
+          {`type ResizePosition = 
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom-right'
+  | 'bottom-left'`}
         </code>
       </pre>
 
@@ -96,24 +122,42 @@ export default function TypesPage() {
       <pre>
         <code className="language-typescript">
           {`import { Drager } from '@es-space/es-drager-react'
-import type { DragerProps, Connection, AnchorPosition } from '@es-space/es-drager-react'
+import type { DragerProps, Connection } from '@es-space/es-drager-react'
 
 // Using the component with TypeScript
 function MyComponent() {
+  const [selected, setSelected] = useState(false)
+  const [disabled, setDisabled] = useState(false)
+
   const handleConnect = (connection: Connection) => {
-    const { sourceId, sourceAnchor, targetId, targetAnchor } = connection
-    // Handle connection
+    console.log('Connected:', connection)
+  }
+
+  const handleResize = (size: { width: number; height: number }) => {
+    console.log('New size:', size)
   }
 
   return (
     <Drager
       id="my-drager"
+      selected={selected}
+      disabled={disabled}
+      width={200}
+      height={150}
+      minWidth={100}
+      minHeight={100}
       rotatable
       scalable
       resizable
       connectable
       showGuides
       limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
+      onClick={() => setSelected(true)}
+      onBlur={() => {
+        setSelected(false)
+        setDisabled(false)
+      }}
+      onResize={handleResize}
       onConnect={handleConnect}
     >
       Content
