@@ -21,7 +21,7 @@ export function Header() {
   ]
 
   return (
-    <header className="h-14 border-b flex items-center px-4 bg-white z-10">
+    <header className="h-14 border-b flex items-center px-4 bg-white z-9999">
       <style jsx>
         {`
         @keyframes heartbeat {

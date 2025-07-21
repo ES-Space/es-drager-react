@@ -17,20 +17,14 @@ export default function TypesPage() {
   id?: string
   children: React.ReactNode
   className?: string
-  style?: React.CSSProperties
+  style?: React.CSSProperties  // Use for dimensions (width, height, minWidth, etc.)
   selected?: boolean
   disabled?: boolean
   draggable?: boolean
 
-  // Dimension props
-  width?: number
-  height?: number
+  // Position props
   top?: number
   left?: number
-  minWidth?: number
-  minHeight?: number
-  maxWidth?: number
-  maxHeight?: number
 
   // Feature flags
   rotatable?: boolean
@@ -140,10 +134,12 @@ function MyComponent() {
       id="my-drager"
       selected={selected}
       disabled={disabled}
-      width={200}
-      height={150}
-      minWidth={100}
-      minHeight={100}
+      style={{
+        width: '200px',
+        height: '150px',
+        minWidth: '100px',
+        minHeight: '100px'
+      }}
       rotatable
       scalable
       resizable

@@ -18,14 +18,38 @@ export default function QuickStartPage() {
         Import the Drager component and use it to wrap any content you want to make draggable:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
-          <Drager className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium">
+          <Drager
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
+          >
             Drag me!
           </Drager>
           <Drager
-            className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '200px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#22C55E',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '200px',
+            }}
           >
             Me too!
           </Drager>
@@ -38,7 +62,13 @@ export default function QuickStartPage() {
 
 function App() {
   return (
-    <Drager className="w-32 h-32 bg-blue-500">
+    <Drager
+      style={{
+        width: '128px',
+        height: '128px',
+        backgroundColor: '#3B82F6'
+      }}
+    >
       Drag me!
     </Drager>
   )
@@ -52,10 +82,21 @@ function App() {
         Enable rotation and scaling with simple props:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             rotatable
             scalable
             minScale={0.5}
@@ -69,7 +110,15 @@ function App() {
       <pre className="language-tsx">
         <code>
           {`<Drager
-  className="w-32 h-32 bg-blue-500"
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}
   rotatable
   scalable
   minScale={0.5}
@@ -86,19 +135,41 @@ function App() {
         Enable connection points to create node-based interfaces:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
             id="node-1"
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             connectable
           >
             Node 1
           </Drager>
           <Drager
             id="node-2"
-            className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '200px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#22C55E',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '200px',
+            }}
             connectable
           >
             Node 2
@@ -110,10 +181,18 @@ function App() {
         <code>
           {`<Drager
   id="node-1"
-  className="w-32 h-32 bg-blue-500"
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}
   connectable
-  onConnect={(sourceId, sourceAnchor, targetId, targetAnchor) => {
-    console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
+  onConnect={(connection) => {
+    console.log('Connected:', connection)
   }}
 >
   Node 1

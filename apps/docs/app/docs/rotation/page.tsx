@@ -22,10 +22,21 @@ export default function RotationPage() {
         prop. A rotation handle will appear above the element:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             rotatable
           >
             Rotate me!
@@ -33,7 +44,27 @@ export default function RotationPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+>
+  Rotate me!
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           Drag the rotation handle above the element to rotate it.
         </p>
@@ -49,10 +80,21 @@ export default function RotationPage() {
         prop (in degrees):
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             rotatable
             rotation={45}
           >
@@ -60,6 +102,27 @@ export default function RotationPage() {
           </Drager>
         </InfiniteCanvas>
       </div>
+
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  rotation={45}
+>
+  45° Rotation
+</Drager>`}
+        </code>
+      </pre>
 
       <h2>Rotation Events</h2>
 
@@ -71,20 +134,56 @@ export default function RotationPage() {
         event handler:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             rotatable
-            // eslint-disable-next-line no-console
-            onRotate={angle => console.log('Current angle:', angle)}
+            onRotate={(angle) => {
+              // eslint-disable-next-line no-console
+              console.log('Current angle:', angle)
+            }}
           >
             Check console
           </Drager>
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  onRotate={(angle) => {
+    console.log('Current angle:', angle)
+  }}
+>
+  Check console
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           Open your browser's console to see the rotation angle being logged.
         </p>
@@ -96,17 +195,35 @@ export default function RotationPage() {
         Rotation works seamlessly with dragging and other features:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
-          <div className="relative w-[400px] h-[300px] border-2 border-dashed border-gray-300 rounded-lg">
+          <div style={{
+            position: 'relative',
+            width: '400px',
+            height: '300px',
+            border: '2px dashed #d1d5db',
+            borderRadius: '8px',
+          }}
+          >
             <Drager
-              className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+              style={{
+                width: '128px',
+                height: '128px',
+                backgroundColor: '#3B82F6',
+                borderRadius: '8px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '500',
+              }}
               rotatable
               limit={{
                 minX: 0,
-                maxX: 400 - 128,
+                maxX: 272, // 400 - 128
                 minY: 0,
-                maxY: 300 - 128,
+                maxY: 172, // 300 - 128
               }}
             >
               Drag & Rotate
@@ -114,6 +231,32 @@ export default function RotationPage() {
           </div>
         </InfiniteCanvas>
       </div>
+
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  limit={{
+    minX: 0,
+    maxX: 272, // container width - element width
+    minY: 0,
+    maxY: 172  // container height - element height
+  }}
+>
+  Drag & Rotate
+</Drager>`}
+        </code>
+      </pre>
     </div>
   )
 }

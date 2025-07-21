@@ -37,7 +37,7 @@ export default function PropsPage() {
             <td><code>style</code></td>
             <td><code>CSSProperties</code></td>
             <td>-</td>
-            <td>Additional inline styles.</td>
+            <td>Inline styles for dimensions (width, height, minWidth, etc.) and appearance.</td>
           </tr>
           <tr>
             <td><code>selected</code></td>
@@ -60,7 +60,7 @@ export default function PropsPage() {
         </tbody>
       </table>
 
-      <h2>Dimension Props</h2>
+      <h2>Position Props</h2>
       <table>
         <thead>
           <tr>
@@ -72,18 +72,6 @@ export default function PropsPage() {
         </thead>
         <tbody>
           <tr>
-            <td><code>width</code></td>
-            <td><code>number</code></td>
-            <td>-</td>
-            <td>Width of the element in pixels.</td>
-          </tr>
-          <tr>
-            <td><code>height</code></td>
-            <td><code>number</code></td>
-            <td>-</td>
-            <td>Height of the element in pixels.</td>
-          </tr>
-          <tr>
             <td><code>top</code></td>
             <td><code>number</code></td>
             <td>0</td>
@@ -94,30 +82,6 @@ export default function PropsPage() {
             <td><code>number</code></td>
             <td>0</td>
             <td>Left position of the element.</td>
-          </tr>
-          <tr>
-            <td><code>minWidth</code></td>
-            <td><code>number</code></td>
-            <td>20</td>
-            <td>Minimum width of the element.</td>
-          </tr>
-          <tr>
-            <td><code>minHeight</code></td>
-            <td><code>number</code></td>
-            <td>20</td>
-            <td>Minimum height of the element.</td>
-          </tr>
-          <tr>
-            <td><code>maxWidth</code></td>
-            <td><code>number</code></td>
-            <td>-</td>
-            <td>Maximum width of the element.</td>
-          </tr>
-          <tr>
-            <td><code>maxHeight</code></td>
-            <td><code>number</code></td>
-            <td>-</td>
-            <td>Maximum height of the element.</td>
           </tr>
         </tbody>
       </table>

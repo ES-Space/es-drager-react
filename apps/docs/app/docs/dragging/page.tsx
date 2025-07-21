@@ -18,33 +18,62 @@ export default function DraggingPage() {
         By default, any Drager component can be dragged by clicking and holding:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
-          <Drager className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium">
+          <Drager
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
+          >
             Drag me!
           </Drager>
           <Drager
-            className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '200px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#22C55E',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '200px',
+            }}
           >
             Drag me too!
           </Drager>
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
-        <p>
-          Tips:
-          {' '}
-          <span className="font-medium">Middle mouse button</span>
-          {' '}
-          to pan canvas,
-          {' '}
-          <span className="font-medium">Ctrl + Scroll</span>
-          {' '}
-          to zoom
-        </p>
-      </div>
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+>
+  Drag me!
+</Drager>`}
+        </code>
+      </pre>
 
       <h2>Movement Constraints</h2>
 
@@ -56,19 +85,45 @@ export default function DraggingPage() {
         prop:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
-          <div className="relative w-[400px] h-[300px] border-2 border-dashed border-gray-300 rounded-lg">
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm text-gray-500">
+          <div style={{
+            position: 'relative',
+            width: '400px',
+            height: '300px',
+            border: '2px dashed #d1d5db',
+            borderRadius: '8px',
+          }}
+          >
+            <div style={{
+              position: 'absolute',
+              top: '-24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '14px',
+              color: '#6b7280',
+            }}
+            >
               Constrained Area
             </div>
             <Drager
-              className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+              style={{
+                width: '128px',
+                height: '128px',
+                backgroundColor: '#3B82F6',
+                borderRadius: '8px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '500',
+              }}
               limit={{
                 minX: 0,
-                maxX: 400 - 128, // width - element width
+                maxX: 272, // 400 - 128
                 minY: 0,
-                maxY: 300 - 128, // height - element height
+                maxY: 172, // 300 - 128
               }}
             >
               Limited move
@@ -76,6 +131,31 @@ export default function DraggingPage() {
           </div>
         </InfiniteCanvas>
       </div>
+
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  limit={{
+    minX: 0,
+    maxX: 272, // container width - element width
+    minY: 0,
+    maxY: 172  // container height - element height
+  }}
+>
+  Limited move
+</Drager>`}
+        </code>
+      </pre>
 
       <h2>Drag Events</h2>
 
@@ -101,10 +181,21 @@ export default function DraggingPage() {
         </li>
       </ul>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             onDragStart={() => {
               // eslint-disable-next-line no-console
               console.log('Started dragging')
@@ -123,7 +214,35 @@ export default function DraggingPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  onDragStart={() => {
+    console.log('Started dragging')
+  }}
+  onDrag={(pos) => {
+    console.log('Current position:', pos)
+  }}
+  onDragEnd={() => {
+    console.log('Finished dragging')
+  }}
+>
+  Check console
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           Open your browser's console to see the events being fired.
         </p>

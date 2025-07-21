@@ -31,11 +31,23 @@ export function IntroductionContent() {
 
       <h2>Interactive Demo</h2>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '50px', top: '20px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '50px',
+              top: '50px',
+            }}
             rotatable
             scalable
             resizable
@@ -44,17 +56,40 @@ export function IntroductionContent() {
           </Drager>
           <Drager
             id="node-1"
-            className="w-32 h-32 bg-green-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '150px', top: '20px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#22C55E',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '250px',
+              top: '150px',
+            }}
             connectable
-            limit={{ minX: 100, maxX: 400, minY: 0, maxY: 300 }}
           >
             Connections
           </Drager>
           <Drager
             id="node-2"
-            className="w-32 h-32 bg-purple-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
-            style={{ left: '250px', top: '20px' }}
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#A855F7',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+              left: '450px',
+              top: '250px',
+            }}
             rotatable
             scalable
             resizable
@@ -75,7 +110,11 @@ export function IntroductionContent() {
 function App() {
   return (
     <Drager
-      className="w-32 h-32 bg-blue-500"
+      style={{
+        width: '128px',
+        height: '128px',
+        backgroundColor: '#3B82F6'
+      }}
       rotatable
       scalable
       resizable

@@ -45,6 +45,10 @@ function App() {
 
   return (
     <Drager
+      style={{
+        width: '200px',
+        height: '150px'
+      }}
       className="drager-element"
       selected={selected}
       rotatable
@@ -69,23 +73,17 @@ function App() {
 |------|------|---------|-------------|
 | id | string | - | Unique identifier for the drager |
 | className | string | - | CSS class names |
-| style | CSSProperties | - | Inline styles |
+| style | CSSProperties | - | Inline styles for dimensions and appearance |
 | selected | boolean | false | Whether the element is selected |
 | disabled | boolean | false | Whether the element is disabled |
 | draggable | boolean | true | Whether the element can be dragged |
 
-### Dimension Props
+### Position Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| width | number | - | Width of the element |
-| height | number | - | Height of the element |
 | top | number | 0 | Top position |
 | left | number | 0 | Left position |
-| minWidth | number | 20 | Minimum width |
-| minHeight | number | 20 | Minimum height |
-| maxWidth | number | - | Maximum width |
-| maxHeight | number | - | Maximum height |
 
 ### Feature Props
 
@@ -134,6 +132,10 @@ function App() {
   return (
     <Drager
       className="drager-element"
+      style={{
+        width: '200px',
+        height: '150px'
+      }}
       selected={selected}
       disabled={disabled}
       onClick={() => setSelected(true)}
@@ -153,12 +155,14 @@ function App() {
 ```tsx
 <Drager
   className="drager-element"
-  width={200}
-  height={150}
-  minWidth={100}
-  minHeight={100}
-  maxWidth={300}
-  maxHeight={250}
+  style={{
+    width: '200px',
+    height: '150px',
+    minWidth: '100px',
+    minHeight: '100px',
+    maxWidth: '300px',
+    maxHeight: '250px'
+  }}
   resizable
 >
   Resizable with constraints
@@ -170,6 +174,10 @@ function App() {
 ```tsx
 <Drager
   className="drager-element"
+  style={{
+    width: '200px',
+    height: '150px'
+  }}
   rotatable
   scalable
   rotation={45}
@@ -188,6 +196,10 @@ function App() {
 <Drager
   id="drager1"
   className="drager-element"
+  style={{
+    width: '200px',
+    height: '150px'
+  }}
   connectable
   onConnect={(connection) => {
     console.log('Connected:', connection)
@@ -202,6 +214,10 @@ function App() {
 ```tsx
 <Drager
   className="drager-element"
+  style={{
+    width: '200px',
+    height: '150px'
+  }}
   limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
   showGuides
   snapToElements

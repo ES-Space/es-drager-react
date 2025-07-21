@@ -33,8 +33,8 @@ export default function InstallationPage() {
         <code>
           {`{
   "dependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0",
   }
 }`}
         </code>

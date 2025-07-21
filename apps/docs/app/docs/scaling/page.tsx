@@ -27,10 +27,21 @@ export default function ScalingPage() {
         prop:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             scalable
           >
             Scroll to scale
@@ -38,7 +49,27 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+>
+  Scroll to scale
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           Use your mouse wheel while hovering over the element to scale it.
         </p>
@@ -58,10 +89,21 @@ export default function ScalingPage() {
         props:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             scalable
             minScale={0.5}
             maxScale={2}
@@ -71,7 +113,29 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  minScale={0.5}
+  maxScale={2}
+>
+  Limited scaling
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           This element can only be scaled between 50% and 200% of its original size.
         </p>
@@ -87,10 +151,21 @@ export default function ScalingPage() {
         event handler:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             scalable
             onScale={handleScale}
           >
@@ -99,7 +174,30 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  onScale={(scale) => {
+    console.log('Current scale:', scale)
+  }}
+>
+  Check console
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           Open your browser's console to see the scale value being logged.
         </p>
@@ -111,10 +209,21 @@ export default function ScalingPage() {
         Scaling works seamlessly with dragging and rotation:
       </p>
 
-      <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
+      <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
           <Drager
-            className="w-32 h-32 bg-blue-500 rounded-lg shadow-lg flex items-center justify-center text-white font-medium"
+            style={{
+              width: '128px',
+              height: '128px',
+              backgroundColor: '#3B82F6',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '500',
+            }}
             scalable
             rotatable
             minScale={0.5}
@@ -125,7 +234,30 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <div className="text-sm text-gray-500 mt-2">
+      <pre className="language-tsx">
+        <code>
+          {`<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  rotatable
+  minScale={0.5}
+  maxScale={2}
+>
+  Try all features
+</Drager>`}
+        </code>
+      </pre>
+
+      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
           This element can be dragged, rotated, and scaled.
         </p>
