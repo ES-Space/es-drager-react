@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 export default function TypesPage() {
   return (
     <div className="prose prose-blue max-w-none">
