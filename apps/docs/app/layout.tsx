@@ -1,3 +1,4 @@
+import I18nProvider from './components/I18nProvider'
 import './globals.css'
 
 export const metadata = {
@@ -13,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        {children}
+        <I18nProvider>{children}</I18nProvider>
       </body>
     </html>
   )

@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitch from './LanguageSwitch'
 
 interface NavItem {
-  label: string
+  label: keyof typeof import('../i18n/locales/en-US').default['header']
   href: string
 }
 
@@ -14,10 +16,12 @@ interface NavItem {
  */
 export function Header() {
   const pathname = usePathname()
+  const { t } = useTranslation()
+
   const navItems: NavItem[] = [
-    { label: 'Examples', href: '/' },
-    { label: 'Documentation', href: '/docs' },
-    { label: 'GitHub', href: 'https://github.com/ES-Space/es-drager-react' },
+    { label: 'examples', href: '/' },
+    { label: 'documentation', href: '/docs' },
+    { label: 'github', href: 'https://github.com/ES-Space/es-drager-react' },
   ]
 
   return (
@@ -36,10 +40,10 @@ export function Header() {
         }
       `}
       </style>
-      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
         <div className="w-2 h-2 rounded-full bg-blue-500 heartbeat-dot" />
-        <h1 className="text-sm font-medium">ES Drager</h1>
-      </div>
+        <h1 className="text-sm font-medium">{t('common.title')}</h1>
+      </Link>
 
       <div className="flex-1 flex justify-center">
         <nav className="flex gap-4 text-sm">
@@ -53,10 +57,14 @@ export function Header() {
                   : 'text-gray-500'
               }`}
             >
-              {item.label}
+              {t(`header.${item.label}`)}
             </Link>
           ))}
         </nav>
+      </div>
+
+      <div className="flex items-center">
+        <LanguageSwitch />
       </div>
     </header>
   )
