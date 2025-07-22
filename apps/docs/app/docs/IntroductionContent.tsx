@@ -1,35 +1,36 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { BASE_PATH } from '../../env'
 import { InfiniteCanvas } from '../components/InfiniteCanvas'
 
 export function IntroductionContent() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>ES Drager</h1>
+      <h1>{t('introduction.title')}</h1>
 
       <p className="lead">
-        A lightweight React component for creating draggable, rotatable and scalable elements with connection capabilities.
+        {t('introduction.lead')}
       </p>
 
-      <h2>Overview</h2>
+      <h2>{t('introduction.overview')}</h2>
 
       <p>
-        ES Drager provides a simple yet powerful way to add drag, rotate, scale, and resize functionality to any React component.
-        With built-in support for connections, alignment guides, position constraints, and snapping, it's perfect for building:
+        {t('introduction.overviewDesc')}
       </p>
 
       <ul>
-        <li>Diagram editors</li>
-        <li>Visual builders</li>
-        <li>Interactive interfaces</li>
-        <li>Layout tools</li>
-        <li>Flow charts</li>
-        <li>Design tools</li>
+        <li>{t('introduction.usecase.diagram')}</li>
+        <li>{t('introduction.usecase.visual')}</li>
+        <li>{t('introduction.usecase.interactive')}</li>
+        <li>{t('introduction.usecase.layout')}</li>
+        <li>{t('introduction.usecase.flow')}</li>
+        <li>{t('introduction.usecase.design')}</li>
       </ul>
 
-      <h2>Interactive Demo</h2>
+      <h2>{t('introduction.demo')}</h2>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
@@ -101,7 +102,7 @@ export function IntroductionContent() {
         </InfiniteCanvas>
       </div>
 
-      <h2>Quick Example</h2>
+      <h2>{t('introduction.quickExample')}</h2>
 
       <pre className="language-tsx">
         <code>
@@ -132,31 +133,24 @@ function App() {
         </code>
       </pre>
 
-      <h2>Next Steps</h2>
+      <h2>{t('introduction.nextSteps')}</h2>
 
       <ul>
         <li>
-          Check out the
-          {' '}
-          <a href={`${BASE_PATH}/docs/installation`}>Installation</a>
-          {' '}
-          guide to get started
+          {t('introduction.next.install1')}
+          <a href={`${BASE_PATH}/docs/installation`}>{t('introduction.next.install2')}</a>
+          {t('introduction.next.install3')}
         </li>
         <li>
-          Learn about basic
-          {' '}
-          <a href={`${BASE_PATH}/docs/dragging`}>dragging</a>
-          {' '}
-          functionality
+          {t('introduction.next.drag1')}
+          <a href={`${BASE_PATH}/docs/dragging`}>{t('introduction.next.drag2')}</a>
+          {t('introduction.next.drag3')}
         </li>
         <li>
-          Explore advanced features like
-          {' '}
-          <a href={`${BASE_PATH}/docs/connections`}>connections</a>
-          {' '}
-          and
-          {' '}
-          <a href={`${BASE_PATH}/docs/props`}>position constraints</a>
+          {t('introduction.next.adv1')}
+          <a href={`${BASE_PATH}/docs/connections`}>{t('introduction.next.adv2')}</a>
+          {t('introduction.next.adv3')}
+          <a href={`${BASE_PATH}/docs/props`}>{t('introduction.next.adv4')}</a>
         </li>
       </ul>
     </div>

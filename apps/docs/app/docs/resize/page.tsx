@@ -1,27 +1,20 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ResizePage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Resize</h1>
+      <h1>{t('resize.title')}</h1>
 
-      <p>
-        ES Drager provides resize functionality through draggable handles on the edges and corners of the element.
-        This allows for intuitive resizing of elements while maintaining aspect ratio or freely adjusting dimensions.
-      </p>
+      <p>{t('resize.desc')}</p>
 
-      <h2>Basic Usage</h2>
+      <h2>{t('resize.basic')}</h2>
 
-      <p>
-        To enable resizing, simply add the
-        {' '}
-        <code>resizable</code>
-        {' '}
-        prop to your Drager component:
-      </p>
+      <p>{t('resize.basicDesc')}</p>
 
       <pre>
         <code className="language-tsx">
@@ -46,26 +39,18 @@ export default function ResizePage() {
         </InfiniteCanvas>
       </div>
 
-      <h2>Resize Handles</h2>
+      <h2>{t('resize.handles')}</h2>
 
-      <p>
-        When
-        {' '}
-        <code>resizable</code>
-        {' '}
-        is enabled, eight resize handles appear:
-      </p>
+      <p>{t('resize.handlesDesc')}</p>
 
       <ul>
-        <li>Four corner handles (top-left, top-right, bottom-left, bottom-right)</li>
-        <li>Four edge handles (top, right, bottom, left)</li>
+        <li>{t('resize.handlesCorner')}</li>
+        <li>{t('resize.handlesEdge')}</li>
       </ul>
 
-      <h2>Combining with Other Features</h2>
+      <h2>{t('resize.combining')}</h2>
 
-      <p>
-        Resize functionality can be combined with other features like rotation, scaling, and connections:
-      </p>
+      <p>{t('resize.combiningDesc')}</p>
 
       <pre>
         <code className="language-tsx">

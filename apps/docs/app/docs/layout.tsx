@@ -2,43 +2,44 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import { Header } from '../components/Header'
-
-const sidebar = [
-  {
-    title: 'Getting Started',
-    links: [
-      { href: '/docs', label: 'Introduction' },
-      { href: '/docs/installation', label: 'Installation' },
-      { href: '/docs/quick-start', label: 'Quick Start' },
-    ],
-  },
-  {
-    title: 'Features',
-    links: [
-      { href: '/docs/dragging', label: 'Dragging' },
-      { href: '/docs/rotation', label: 'Rotation' },
-      { href: '/docs/scaling', label: 'Scaling' },
-      { href: '/docs/resize', label: 'Resize' },
-      { href: '/docs/connections', label: 'Connections' },
-    ],
-  },
-  {
-    title: 'API',
-    links: [
-      { href: '/docs/props', label: 'Props' },
-      { href: '/docs/events', label: 'Events' },
-      { href: '/docs/types', label: 'Types' },
-    ],
-  },
-]
 
 export default function DocsLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { t } = useTranslation()
   const pathname = usePathname()
+  const sidebar = [
+    {
+      title: t('docs.sidebar.gettingStarted'),
+      links: [
+        { href: '/docs', label: t('docs.sidebar.introduction') },
+        { href: '/docs/installation', label: t('docs.sidebar.installation') },
+        { href: '/docs/quick-start', label: t('docs.sidebar.quickStart') },
+      ],
+    },
+    {
+      title: t('docs.sidebar.features'),
+      links: [
+        { href: '/docs/dragging', label: t('docs.sidebar.dragging') },
+        { href: '/docs/rotation', label: t('docs.sidebar.rotation') },
+        { href: '/docs/scaling', label: t('docs.sidebar.scaling') },
+        { href: '/docs/resize', label: t('docs.sidebar.resize') },
+        { href: '/docs/connections', label: t('docs.sidebar.connections') },
+      ],
+    },
+    {
+      title: t('docs.sidebar.api'),
+      links: [
+        { href: '/docs/props', label: t('docs.sidebar.props') },
+        { href: '/docs/events', label: t('docs.sidebar.events') },
+        { href: '/docs/types', label: t('docs.sidebar.types') },
+      ],
+    },
+  ]
 
   return (
     <div className="min-h-screen">
@@ -61,10 +62,9 @@ export default function DocsLayout({
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className={`block text-sm ${
-                          pathname === link.href
-                            ? 'text-blue-600 font-medium'
-                            : 'text-gray-600 hover:text-gray-900'
+                        className={`block text-sm ${pathname === link.href
+                          ? 'text-blue-600 font-medium'
+                          : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
                         {link.label}

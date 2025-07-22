@@ -1,15 +1,16 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 export default function EventsPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Event Handlers</h1>
+      <h1>{t('events.title')}</h1>
 
-      <p>
-        ES Drager provides a rich set of event handlers to help you build interactive interfaces.
-      </p>
+      <p>{t('events.desc')}</p>
 
-      <h2>Basic Events</h2>
+      <h2>{t('events.basic')}</h2>
 
       <table>
         <thead>
@@ -33,7 +34,7 @@ export default function EventsPage() {
         </tbody>
       </table>
 
-      <h2>Drag Events</h2>
+      <h2>{t('events.drag')}</h2>
 
       <table>
         <thead>
@@ -62,7 +63,7 @@ export default function EventsPage() {
         </tbody>
       </table>
 
-      <h2>Transform Events</h2>
+      <h2>{t('events.transform')}</h2>
 
       <table>
         <thead>
@@ -91,7 +92,7 @@ export default function EventsPage() {
         </tbody>
       </table>
 
-      <h2>Connection Events</h2>
+      <h2>{t('events.connection')}</h2>
 
       <table>
         <thead>
@@ -114,7 +115,7 @@ export default function EventsPage() {
         </tbody>
       </table>
 
-      <h2>Usage Example</h2>
+      <h2>{t('events.example')}</h2>
 
       <pre>
         <code>

@@ -1,9 +1,11 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ConnectionsPage() {
+  const { t } = useTranslation()
   const handleConnect = () => {
     // eslint-disable-next-line no-console
     console.log('connect')
@@ -11,24 +13,13 @@ export default function ConnectionsPage() {
 
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Connections</h1>
+      <h1>{t('connections.title')}</h1>
 
-      <p>
-        ES Drager provides a powerful connection system that allows you to create visual relationships between elements using anchor points and bezier curves.
-      </p>
+      <p>{t('connections.desc')}</p>
 
-      <h2>Basic Connections</h2>
+      <h2>{t('connections.basic')}</h2>
 
-      <p>
-        To enable connections, set the
-        {' '}
-        <code>connectable</code>
-        {' '}
-        prop and provide a unique
-        {' '}
-        <code>id</code>
-        :
-      </p>
+      <p>{t('connections.basicDesc')}</p>
 
       <pre className="language-tsx">
         <code>
@@ -64,20 +55,13 @@ export default function ConnectionsPage() {
       </div>
 
       <div className="text-sm text-gray-500 mt-2">
-        <p>
-          Hover over the blue dots (anchor points) and drag to another anchor point to create a connection.
-          The connection will be visualized as a bezier curve.
-        </p>
+        <p>{t('connections.tip')}</p>
       </div>
 
-      <h2>Connection Events</h2>
+      <h2>{t('connections.connectionEvents')}</h2>
 
       <p>
-        Track connections using the
-        {' '}
-        <code>onConnect</code>
-        {' '}
-        event handler. This event provides details about the source and target nodes:
+        {t('connections.connectionEventsDesc')}
       </p>
 
       <pre className="language-tsx">
@@ -102,7 +86,7 @@ export default function ConnectionsPage() {
             connectable
             onConnect={handleConnect}
           >
-            Connect me
+            {t('connections.connectMe')}
           </Drager>
           <Drager
             id="event-target"
@@ -111,26 +95,26 @@ export default function ConnectionsPage() {
             connectable
             onConnect={handleConnect}
           >
-            To me
+            {t('connections.toMe')}
           </Drager>
         </InfiniteCanvas>
       </div>
 
-      <h2>Connection Features</h2>
+      <h2>{t('connections.connectionFeatures')}</h2>
 
       <ul>
-        <li>Four anchor points per node (top, right, bottom, left)</li>
-        <li>Visual feedback during connection creation</li>
-        <li>Automatic bezier curve path calculation</li>
-        <li>Connection lines update automatically when nodes move</li>
-        <li>Click on connection lines to select them</li>
-        <li>Press Delete/Backspace to remove selected connections</li>
+        <li>{t('connections.fourAnchors')}</li>
+        <li>{t('connections.visualFeedback')}</li>
+        <li>{t('connections.automaticBezier')}</li>
+        <li>{t('connections.autoUpdate')}</li>
+        <li>{t('connections.clickToSelect')}</li>
+        <li>{t('connections.deleteConnections')}</li>
       </ul>
 
-      <h2>Complex Example</h2>
+      <h2>{t('connections.complexExample')}</h2>
 
       <p>
-        Connections work seamlessly with rotation and scaling:
+        {t('connections.complexExampleDesc')}
       </p>
 
       <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
@@ -143,7 +127,7 @@ export default function ConnectionsPage() {
             rotatable
             scalable
           >
-            Node 1
+            {t('connections.node1')}
           </Drager>
           <Drager
             id="complex-2"
@@ -153,7 +137,7 @@ export default function ConnectionsPage() {
             rotatable
             scalable
           >
-            Node 2
+            {t('connections.node2')}
           </Drager>
           <Drager
             id="complex-3"
@@ -163,14 +147,14 @@ export default function ConnectionsPage() {
             rotatable
             scalable
           >
-            Node 3
+            {t('connections.node3')}
           </Drager>
         </InfiniteCanvas>
       </div>
 
       <div className="text-sm text-gray-500 mt-2">
         <p>
-          Try creating connections between nodes while rotating and scaling them. The connections will automatically update to maintain their positions.
+          {t('connections.tryConnections')}
         </p>
       </div>
     </div>

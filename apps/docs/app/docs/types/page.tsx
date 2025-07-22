@@ -1,14 +1,15 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 export default function TypesPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Type Definitions</h1>
+      <h1>{t('types.title')}</h1>
 
-      <h2>DragerProps</h2>
-      <p>
-        The main props interface for the Drager component.
-      </p>
+      <h2>{t('types.dragerProps')}</h2>
+      <p>{t('types.dragerPropsDesc')}</p>
 
       <pre>
         <code className="language-typescript">
@@ -60,10 +61,8 @@ export default function TypesPage() {
         </code>
       </pre>
 
-      <h2>Connection</h2>
-      <p>
-        Represents a connection between two Drager elements.
-      </p>
+      <h2>{t('types.connection')}</h2>
+      <p>{t('types.connectionDesc')}</p>
 
       <pre>
         <code className="language-typescript">
@@ -76,10 +75,8 @@ export default function TypesPage() {
         </code>
       </pre>
 
-      <h2>AnchorPosition</h2>
-      <p>
-        Valid positions for connection anchors.
-      </p>
+      <h2>{t('types.anchorPosition')}</h2>
+      <p>{t('types.anchorPositionDesc')}</p>
 
       <pre>
         <code className="language-typescript">
@@ -87,10 +84,8 @@ export default function TypesPage() {
         </code>
       </pre>
 
-      <h2>ResizePosition</h2>
-      <p>
-        Valid positions for resize handles.
-      </p>
+      <h2>{t('types.resizePosition')}</h2>
+      <p>{t('types.resizePositionDesc')}</p>
 
       <pre>
         <code className="language-typescript">
@@ -106,10 +101,8 @@ export default function TypesPage() {
         </code>
       </pre>
 
-      <h2>Usage Example</h2>
-      <p>
-        Here's how to use these types in your TypeScript code:
-      </p>
+      <h2>{t('types.example')}</h2>
+      <p>{t('types.exampleDesc')}</p>
 
       <pre>
         <code className="language-typescript">
