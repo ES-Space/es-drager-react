@@ -1,26 +1,20 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function RotationPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Rotation</h1>
+      <h1>{t('rotation.title')}</h1>
 
-      <p>
-        ES Drager provides built-in rotation functionality that can be enabled with a single prop.
-      </p>
+      <p>{t('rotation.desc')}</p>
 
-      <h2>Basic Rotation</h2>
+      <h2>{t('rotation.basic')}</h2>
 
-      <p>
-        Enable rotation by setting the
-        {' '}
-        <code>rotatable</code>
-        {' '}
-        prop. A rotation handle will appear above the element:
-      </p>
+      <p>{t('rotation.basicDesc')}</p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
@@ -65,12 +59,10 @@ export default function RotationPage() {
       </pre>
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
-        <p>
-          Drag the rotation handle above the element to rotate it.
-        </p>
+        <p>{t('rotation.tip')}</p>
       </div>
 
-      <h2>Initial Rotation</h2>
+      <h2>{t('rotation.initialRotation')}</h2>
 
       <p>
         You can set an initial rotation angle using the
@@ -124,7 +116,7 @@ export default function RotationPage() {
         </code>
       </pre>
 
-      <h2>Rotation Events</h2>
+      <h2>{t('rotation.rotationEvents')}</h2>
 
       <p>
         Track rotation changes using the
@@ -189,7 +181,7 @@ export default function RotationPage() {
         </p>
       </div>
 
-      <h2>Combined with Dragging</h2>
+      <h2>{t('rotation.combinedWithDragging')}</h2>
 
       <p>
         Rotation works seamlessly with dragging and other features:

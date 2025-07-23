@@ -1,21 +1,23 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function QuickStartPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Quick Start</h1>
+      <h1>{t('quickStart.title')}</h1>
 
       <p>
-        Get started with ES Drager in just a few minutes.
+        {t('quickStart.desc')}
       </p>
 
-      <h2>Basic Usage</h2>
+      <h2>{t('quickStart.basicUsage')}</h2>
 
       <p>
-        Import the Drager component and use it to wrap any content you want to make draggable:
+        {t('quickStart.basicUsageDesc')}
       </p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
@@ -76,10 +78,10 @@ function App() {
         </code>
       </pre>
 
-      <h2>Adding Features</h2>
+      <h2>{t('quickStart.addingFeatures')}</h2>
 
       <p>
-        Enable rotation and scaling with simple props:
+        {t('quickStart.addingFeaturesDesc')}
       </p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
@@ -129,10 +131,10 @@ function App() {
         </code>
       </pre>
 
-      <h2>Adding Connections</h2>
+      <h2>{t('quickStart.addingConnections')}</h2>
 
       <p>
-        Enable connection points to create node-based interfaces:
+        {t('quickStart.addingConnectionsDesc')}
       </p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>

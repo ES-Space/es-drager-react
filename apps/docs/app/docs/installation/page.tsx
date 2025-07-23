@@ -1,33 +1,32 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 export default function InstallationPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Installation</h1>
+      <h1>{t('installation.title')}</h1>
 
-      <p>
-        ES Drager can be installed via npm, yarn, or pnpm.
-      </p>
+      <p>{t('installation.desc')}</p>
 
-      <h2>Using npm</h2>
+      <h2>{t('installation.npm')}</h2>
       <pre className="language-bash">
         <code>npm install @es-space/es-drager-react</code>
       </pre>
 
-      <h2>Using yarn</h2>
+      <h2>{t('installation.yarn')}</h2>
       <pre className="language-bash">
         <code>yarn add @es-space/es-drager-react</code>
       </pre>
 
-      <h2>Using pnpm</h2>
+      <h2>{t('installation.pnpm')}</h2>
       <pre className="language-bash">
         <code>pnpm add @es-space/es-drager-react</code>
       </pre>
 
-      <h2>Peer Dependencies</h2>
-      <p>
-        ES Drager requires React 18 or later as a peer dependency. Make sure you have it installed in your project:
-      </p>
+      <h2>{t('installation.peer')}</h2>
+      <p>{t('installation.peerDesc')}</p>
 
       <pre className="language-json">
         <code>

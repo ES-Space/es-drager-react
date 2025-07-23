@@ -1,9 +1,11 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ScalingPage() {
+  const { t } = useTranslation()
   const handleScale = (scale: number) => {
     // eslint-disable-next-line no-console
     console.log('Current scale:', scale)
@@ -11,21 +13,13 @@ export default function ScalingPage() {
 
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Scaling</h1>
+      <h1>{t('scaling.title')}</h1>
 
-      <p>
-        ES Drager supports scaling functionality through mouse wheel interaction.
-      </p>
+      <p>{t('scaling.desc')}</p>
 
-      <h2>Basic Scaling</h2>
+      <h2>{t('scaling.basic')}</h2>
 
-      <p>
-        Enable scaling by setting the
-        {' '}
-        <code>scalable</code>
-        {' '}
-        prop:
-      </p>
+      <p>{t('scaling.basicDesc')}</p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         <InfiniteCanvas>
@@ -70,12 +64,10 @@ export default function ScalingPage() {
       </pre>
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
-        <p>
-          Use your mouse wheel while hovering over the element to scale it.
-        </p>
+        <p>{t('scaling.tip')}</p>
       </div>
 
-      <h2>Scale Limits</h2>
+      <h2>{t('scaling.scaleLimits')}</h2>
 
       <p>
         You can control the minimum and maximum scale values using the
@@ -141,7 +133,7 @@ export default function ScalingPage() {
         </p>
       </div>
 
-      <h2>Scale Events</h2>
+      <h2>{t('scaling.scaleEvents')}</h2>
 
       <p>
         Track scale changes using the
@@ -203,7 +195,7 @@ export default function ScalingPage() {
         </p>
       </div>
 
-      <h2>Combined Features</h2>
+      <h2>{t('scaling.combinedFeatures')}</h2>
 
       <p>
         Scaling works seamlessly with dragging and rotation:

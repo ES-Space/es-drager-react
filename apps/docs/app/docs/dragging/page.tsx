@@ -1,21 +1,23 @@
 'use client'
 
 import { Drager } from '@es-space/es-drager-react'
+import { useTranslation } from 'react-i18next'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function DraggingPage() {
+  const { t } = useTranslation()
   return (
     <div className="prose prose-blue max-w-none">
-      <h1>Dragging</h1>
+      <h1>{t('dragging.title')}</h1>
 
       <p>
-        Learn how to use ES Drager's dragging functionality.
+        {t('dragging.desc')}
       </p>
 
-      <h2>Basic Dragging</h2>
+      <h2>{t('dragging.basic')}</h2>
 
       <p>
-        By default, any Drager component can be dragged by clicking and holding:
+        {t('dragging.basicDesc')}
       </p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
@@ -75,14 +77,10 @@ export default function DraggingPage() {
         </code>
       </pre>
 
-      <h2>Movement Constraints</h2>
+      <h2>{t('dragging.movementConstraints')}</h2>
 
       <p>
-        You can limit the movement area using the
-        {' '}
-        <code>limit</code>
-        {' '}
-        prop:
+        {t('dragging.movementConstraintsDesc')}
       </p>
 
       <div style={{ margin: '2rem 0', height: '400px', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
@@ -104,7 +102,7 @@ export default function DraggingPage() {
               color: '#6b7280',
             }}
             >
-              Constrained Area
+              {t('dragging.constrainedArea')}
             </div>
             <Drager
               style={{
@@ -126,7 +124,7 @@ export default function DraggingPage() {
                 maxY: 172, // 300 - 128
               }}
             >
-              Limited move
+              {t('dragging.limitedMove')}
             </Drager>
           </div>
         </InfiniteCanvas>
@@ -157,27 +155,33 @@ export default function DraggingPage() {
         </code>
       </pre>
 
-      <h2>Drag Events</h2>
+      <h2>{t('dragging.dragEvents')}</h2>
 
       <p>
-        ES Drager provides three events for drag interactions:
+        {t('dragging.dragEventsDesc')}
       </p>
 
       <ul>
         <li>
           <code>onDragStart</code>
           {' '}
-          - Called when dragging begins
+          -
+          {' '}
+          {t('dragging.onDragStartDesc')}
         </li>
         <li>
           <code>onDrag</code>
           {' '}
-          - Called continuously while dragging
+          -
+          {' '}
+          {t('dragging.onDragDesc')}
         </li>
         <li>
           <code>onDragEnd</code>
           {' '}
-          - Called when dragging ends
+          -
+          {' '}
+          {t('dragging.onDragEndDesc')}
         </li>
       </ul>
 
@@ -209,7 +213,7 @@ export default function DraggingPage() {
               console.log('Finished dragging')
             }}
           >
-            Check console
+            {t('dragging.checkConsole')}
           </Drager>
         </InfiniteCanvas>
       </div>
@@ -244,7 +248,7 @@ export default function DraggingPage() {
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
-          Open your browser's console to see the events being fired.
+          {t('dragging.openConsoleDesc')}
         </p>
       </div>
     </div>
