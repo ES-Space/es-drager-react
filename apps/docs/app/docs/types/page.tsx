@@ -1,19 +1,12 @@
 'use client'
 
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 
 export default function TypesPage() {
   const { t } = useTranslation()
-  return (
-    <div className="prose prose-blue max-w-none">
-      <h1>{t('types.title')}</h1>
 
-      <h2>{t('types.dragerProps')}</h2>
-      <p>{t('types.dragerPropsDesc')}</p>
-
-      <pre>
-        <code className="language-typescript">
-          {`interface DragerProps {
+  const dragerPropsCode = `interface DragerProps {
   // Basic props
   id?: string
   children: React.ReactNode
@@ -57,39 +50,18 @@ export default function TypesPage() {
   onScale?: (scale: number) => void
   onResize?: (size: { width: number; height: number }) => void
   onConnect?: (connection: Connection) => void
-}`}
-        </code>
-      </pre>
+}`
 
-      <h2>{t('types.connection')}</h2>
-      <p>{t('types.connectionDesc')}</p>
-
-      <pre>
-        <code className="language-typescript">
-          {`interface Connection {
+  const connectionCode = `interface Connection {
   sourceId: string
   sourceAnchor: AnchorPosition
   targetId: string
   targetAnchor: AnchorPosition
-}`}
-        </code>
-      </pre>
+}`
 
-      <h2>{t('types.anchorPosition')}</h2>
-      <p>{t('types.anchorPositionDesc')}</p>
+  const anchorPositionCode = `type AnchorPosition = 'top' | 'right' | 'bottom' | 'left'`
 
-      <pre>
-        <code className="language-typescript">
-          {`type AnchorPosition = 'top' | 'right' | 'bottom' | 'left'`}
-        </code>
-      </pre>
-
-      <h2>{t('types.resizePosition')}</h2>
-      <p>{t('types.resizePositionDesc')}</p>
-
-      <pre>
-        <code className="language-typescript">
-          {`type ResizePosition = 
+  const resizePositionCode = `type ResizePosition = 
   | 'top'
   | 'bottom'
   | 'left'
@@ -97,16 +69,9 @@ export default function TypesPage() {
   | 'top-right'
   | 'top-left'
   | 'bottom-right'
-  | 'bottom-left'`}
-        </code>
-      </pre>
+  | 'bottom-left'`
 
-      <h2>{t('types.example')}</h2>
-      <p>{t('types.exampleDesc')}</p>
-
-      <pre>
-        <code className="language-typescript">
-          {`import { Drager } from '@es-space/es-drager-react'
+  const exampleCode = `import { Drager } from '@es-space/es-drager-react'
 import type { DragerProps, Connection } from '@es-space/es-drager-react'
 
 // Using the component with TypeScript
@@ -150,9 +115,36 @@ function MyComponent() {
       Content
     </Drager>
   )
-}`}
-        </code>
-      </pre>
+}`
+
+  return (
+    <div className="prose prose-blue max-w-none">
+      <h1>{t('types.title')}</h1>
+
+      <h2>{t('types.dragerProps')}</h2>
+      <p>{t('types.dragerPropsDesc')}</p>
+
+      <CodeBlock code={dragerPropsCode} />
+
+      <h2>{t('types.connection')}</h2>
+      <p>{t('types.connectionDesc')}</p>
+
+      <CodeBlock code={connectionCode} />
+
+      <h2>{t('types.anchorPosition')}</h2>
+      <p>{t('types.anchorPositionDesc')}</p>
+
+      <CodeBlock code={anchorPositionCode} />
+
+      <h2>{t('types.resizePosition')}</h2>
+      <p>{t('types.resizePositionDesc')}</p>
+
+      <CodeBlock code={resizePositionCode} />
+
+      <h2>{t('types.example')}</h2>
+      <p>{t('types.exampleDesc')}</p>
+
+      <CodeBlock code={exampleCode} />
     </div>
   )
 }

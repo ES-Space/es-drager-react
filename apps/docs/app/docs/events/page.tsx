@@ -1,9 +1,23 @@
 'use client'
 
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 
 export default function EventsPage() {
   const { t } = useTranslation()
+
+  const exampleCode = `<Drager
+  onClick={() => console.log('clicked')}
+  onDragStart={() => console.log('drag started')}
+  onDrag={(pos) => console.log('dragging at:', pos)}
+  onDragEnd={(pos) => console.log('dropped at:', pos)}
+  onRotate={(angle) => console.log('rotated to:', angle)}
+  onResize={(size) => console.log('resized to:', size)}
+  onConnect={(connection) => console.log('connected:', connection)}
+>
+  Content
+</Drager>`
+
   return (
     <div className="prose prose-blue max-w-none">
       <h1>{t('events.title')}</h1>
@@ -117,21 +131,7 @@ export default function EventsPage() {
 
       <h2>{t('events.example')}</h2>
 
-      <pre>
-        <code>
-          {`<Drager
-  onClick={() => console.log('clicked')}
-  onDragStart={() => console.log('drag started')}
-  onDrag={(pos) => console.log('dragging at:', pos)}
-  onDragEnd={(pos) => console.log('dropped at:', pos)}
-  onRotate={(angle) => console.log('rotated to:', angle)}
-  onResize={(size) => console.log('resized to:', size)}
-  onConnect={(connection) => console.log('connected:', connection)}
->
-  Content
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={exampleCode} />
 
     </div>
   )

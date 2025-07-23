@@ -2,6 +2,7 @@
 
 import { Drager } from '@es-space/es-drager-react'
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ScalingPage() {
@@ -10,6 +11,78 @@ export default function ScalingPage() {
     // eslint-disable-next-line no-console
     console.log('Current scale:', scale)
   }
+
+  const basicUsageCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+>
+  Scroll to scale
+</Drager>`
+
+  const limitsCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  minScale={0.5}
+  maxScale={2}
+>
+  Limited scaling
+</Drager>`
+
+  const eventsCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  onScale={(scale) => {
+    console.log('Current scale:', scale)
+  }}
+>
+  Check console
+</Drager>`
+
+  const combinedCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  scalable
+  rotatable
+  minScale={0.5}
+  maxScale={2}
+>
+  Try all features
+</Drager>`
 
   return (
     <div className="prose prose-blue max-w-none">
@@ -43,25 +116,7 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  scalable
->
-  Scroll to scale
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={basicUsageCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>{t('scaling.tip')}</p>
@@ -105,27 +160,7 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  scalable
-  minScale={0.5}
-  maxScale={2}
->
-  Limited scaling
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={limitsCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
@@ -166,28 +201,7 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  scalable
-  onScale={(scale) => {
-    console.log('Current scale:', scale)
-  }}
->
-  Check console
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={eventsCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
@@ -226,28 +240,7 @@ export default function ScalingPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  scalable
-  rotatable
-  minScale={0.5}
-  maxScale={2}
->
-  Try all features
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={combinedCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>

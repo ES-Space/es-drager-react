@@ -2,10 +2,86 @@
 
 import { Drager } from '@es-space/es-drager-react'
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function RotationPage() {
   const { t } = useTranslation()
+
+  const basicUsageCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+>
+  Rotate me!
+</Drager>`
+
+  const initialRotationCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  rotation={45}
+>
+  45° Rotation
+</Drager>`
+
+  const eventsCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  onRotate={(angle) => {
+    console.log('Current angle:', angle)
+  }}
+>
+  Check console
+</Drager>`
+
+  const combinedCode = `<Drager
+  style={{
+    width: '128px',
+    height: '128px',
+    backgroundColor: '#3B82F6',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white'
+  }}
+  rotatable
+  limit={{
+    minX: 0,
+    maxX: 272, // container width - element width
+    minY: 0,
+    maxY: 172  // container height - element height
+  }}
+>
+  Drag & Rotate
+</Drager>`
+
   return (
     <div className="prose prose-blue max-w-none">
       <h1>{t('rotation.title')}</h1>
@@ -38,25 +114,7 @@ export default function RotationPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  rotatable
->
-  Rotate me!
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={basicUsageCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>{t('rotation.tip')}</p>
@@ -95,26 +153,7 @@ export default function RotationPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  rotatable
-  rotation={45}
->
-  45° Rotation
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={initialRotationCode} />
 
       <h2>{t('rotation.rotationEvents')}</h2>
 
@@ -152,28 +191,7 @@ export default function RotationPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  rotatable
-  onRotate={(angle) => {
-    console.log('Current angle:', angle)
-  }}
->
-  Check console
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={eventsCode} />
 
       <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
         <p>
@@ -224,31 +242,7 @@ export default function RotationPage() {
         </InfiniteCanvas>
       </div>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  style={{
-    width: '128px',
-    height: '128px',
-    backgroundColor: '#3B82F6',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white'
-  }}
-  rotatable
-  limit={{
-    minX: 0,
-    maxX: 272, // container width - element width
-    minY: 0,
-    maxY: 172  // container height - element height
-  }}
->
-  Drag & Rotate
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={combinedCode} />
     </div>
   )
 }

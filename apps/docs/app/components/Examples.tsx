@@ -53,23 +53,23 @@ export function Examples() {
 
   return (
     <div className="flex-1 p-8 relative">
-      <div className="absolute inset-0 bg-white">
+      <div className="absolute inset-0 bg-white dark:bg-black">
         <div
-          className="absolute inset-0 bg-[linear-gradient(to_right,#d1d5db_1px,transparent_1px),linear-gradient(to_bottom,#d1d5db_1px,transparent_1px)] bg-[size:32px_32px] opacity-50"
+          className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:32px_32px] opacity-50 dark:bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)]"
         />
-        <div className="absolute inset-0 bg-white/60" />
+        <div className="absolute inset-0 bg-white/60 dark:bg-black/60" />
       </div>
       <div className="relative max-w-screen-xl mx-auto p-8">
         <div className="grid grid-cols-3 gap-8">
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.basicUsage')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
                   top: '4px',
                 }}
-                className="w-32 h-32 border-2 border-dashed border-blue-500 relative bg-white"
+                className="w-32 h-32 border-2 border-dashed border-blue-500 relative bg-white dark:bg-gray-900"
               >
                 <div className="flex items-center justify-center h-full text-blue-500">
                   {t('examples.dragMe')}
@@ -78,12 +78,12 @@ export function Examples() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withConstraints')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <div
                 ref={containerRef}
-                className="absolute inset-4 border-2 border-dashed border-gray-200"
+                className="absolute inset-4 border-2 border-dashed border-gray-200 dark:border-gray-700"
               >
                 <div className="absolute text-xs text-gray-400 -top-6 left-1/2 -translate-x-1/2 mt-10">
                   {t('examples.draggableArea')}
@@ -106,9 +106,9 @@ export function Examples() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withRotation')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
@@ -127,9 +127,9 @@ export function Examples() {
         </div>
 
         <div className="grid grid-cols-3 gap-8 mt-8">
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withScale')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
@@ -148,9 +148,9 @@ export function Examples() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withGuidelines')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
@@ -167,9 +167,9 @@ export function Examples() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withSnapping')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
@@ -201,9 +201,9 @@ export function Examples() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withResize')}</h3>
-            <div className="h-[200px] relative border rounded-lg overflow-hidden">
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
                 style={{
                   left: '4px',
@@ -221,12 +221,12 @@ export function Examples() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-8 shadow-sm mt-8">
+        <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm mt-8">
           <h3 className="text-sm font-medium mb-4">{t('examples.withConnections')}</h3>
-          <div className="text-xs text-gray-500 mb-4">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
             {t('examples.hoverToConnect')}
           </div>
-          <div className="h-[200px] relative border rounded-lg overflow-hidden">
+          <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
             {dragers.map((drager, idx) => (
               <Drager
                 key={idx}

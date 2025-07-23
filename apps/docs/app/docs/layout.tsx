@@ -1,9 +1,15 @@
 'use client'
 
+import { MDXProvider } from '@mdx-js/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { Header } from '../components/Header'
+import { Pre } from '../components/Pre'
+
+const components = {
+  pre: Pre,
+}
 
 export default function DocsLayout({
   children,
@@ -42,48 +48,46 @@ export default function DocsLayout({
   ]
 
   return (
-    <div className="min-h-screen">
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-10">
+    <MDXProvider components={components}>
+      <div className="min-h-screen bg-white dark:bg-black">
+        {/* Fixed Header */}
         <Header />
-      </div>
 
-      <div className="flex pt-14">
-        {' '}
-        {/* Add padding-top to account for fixed header */}
-        {/* Fixed Sidebar */}
-        <div className="fixed left-0 top-14 bottom-0 w-64 overflow-y-auto border-r bg-white">
-          <div className="p-6 space-y-8">
-            {sidebar.map(section => (
-              <div key={section.title}>
-                <h5 className="mb-3 font-medium text-sm text-gray-500">{section.title}</h5>
-                <ul className="space-y-2">
-                  {section.links.map(link => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className={`block text-sm ${pathname === link.href
-                          ? 'text-blue-600 font-medium'
-                          : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        <div className="flex pt-14">
+          {/* Fixed Sidebar */}
+          <div className="fixed left-0 top-14 bottom-0 w-64 overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
+            <div className="p-6 space-y-8">
+              {sidebar.map(section => (
+                <div key={section.title}>
+                  <h5 className="mb-3 font-medium text-sm text-gray-500 dark:text-gray-400">{section.title}</h5>
+                  <ul className="space-y-2">
+                    {section.links.map(link => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className={`block text-sm transition-colors ${pathname === link.href
+                            ? 'text-blue-600 dark:text-blue-400 font-medium'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white'
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Main content with margin for sidebar */}
-        <div className="flex-1 ml-64">
-          <div className="max-w-4xl mx-auto py-12 px-8">
-            {children}
+          {/* Main content with margin for sidebar */}
+          <div className="flex-1 ml-64">
+            <main className="max-w-4xl mx-auto py-12 px-8">
+              {children}
+            </main>
           </div>
         </div>
       </div>
-    </div>
+    </MDXProvider>
   )
 }

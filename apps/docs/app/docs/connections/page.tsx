@@ -2,6 +2,7 @@
 
 import { Drager } from '@es-space/es-drager-react'
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ConnectionsPage() {
@@ -10,6 +11,23 @@ export default function ConnectionsPage() {
     // eslint-disable-next-line no-console
     console.log('connect')
   }
+
+  const basicUsageCode = `<Drager
+  id="node-1"
+  connectable
+  className="w-32 h-32 bg-blue-500"
+>
+  Source
+</Drager>`
+
+  const eventHandlingCode = `const handleConnect = (
+  sourceId: string,    // ID of the source node
+  sourceAnchor: string,// Position of source anchor ('top', 'right', 'bottom', 'left')
+  targetId: string,    // ID of the target node
+  targetAnchor: string // Position of target anchor
+) => {
+  console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
+}`
 
   return (
     <div className="prose prose-blue max-w-none">
@@ -21,17 +39,7 @@ export default function ConnectionsPage() {
 
       <p>{t('connections.basicDesc')}</p>
 
-      <pre className="language-tsx">
-        <code>
-          {`<Drager
-  id="node-1"
-  connectable
-  className="w-32 h-32 bg-blue-500"
->
-  Source
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={basicUsageCode} />
 
       <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
         <InfiniteCanvas>
@@ -64,18 +72,7 @@ export default function ConnectionsPage() {
         {t('connections.connectionEventsDesc')}
       </p>
 
-      <pre className="language-tsx">
-        <code>
-          {`const handleConnect = (
-  sourceId: string,    // ID of the source node
-  sourceAnchor: string,// Position of source anchor ('top', 'right', 'bottom', 'left')
-  targetId: string,    // ID of the target node
-  targetAnchor: string // Position of target anchor
-) => {
-  console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
-}`}
-        </code>
-      </pre>
+      <CodeBlock code={eventHandlingCode} />
 
       <div className="not-prose my-8 h-[400px] rounded-lg border overflow-hidden">
         <InfiniteCanvas>

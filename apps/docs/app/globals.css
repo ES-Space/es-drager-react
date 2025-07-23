@@ -2,9 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-white text-gray-800;
+    @apply dark:bg-black dark:text-gray-300;
+  }
+}
+
 @layer components {
   .prose {
-    @apply max-w-none;
+    @apply max-w-none prose-gray dark:prose-invert;
+  }
+
+  .prose pre {
+    @apply bg-gray-900 text-gray-300;
+    @apply dark:bg-gray-800 dark:text-gray-300;
   }
 }
 

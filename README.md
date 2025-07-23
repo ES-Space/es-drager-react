@@ -8,6 +8,10 @@
   A lightweight React component for creating draggable, rotatable and scalable elements with connection capabilities.
 </p>
 
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
 ## ✨ Features
 
 - 🎯 Drag & drop with constraints

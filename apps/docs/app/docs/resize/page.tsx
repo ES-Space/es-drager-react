@@ -2,10 +2,28 @@
 
 import { Drager } from '@es-space/es-drager-react'
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '../../components/CodeBlock'
 import { InfiniteCanvas } from '../../components/InfiniteCanvas'
 
 export default function ResizePage() {
   const { t } = useTranslation()
+
+  const basicUsageCode = `<Drager
+  className="w-32 h-32 bg-blue-500"
+  resizable
+>
+  Resizable content
+</Drager>`
+
+  const combiningCode = `<Drager
+  className="w-32 h-32 bg-blue-500"
+  resizable
+  rotatable
+  scalable
+>
+  Multi-feature element
+</Drager>`
+
   return (
     <div className="prose prose-blue max-w-none">
       <h1>{t('resize.title')}</h1>
@@ -16,16 +34,7 @@ export default function ResizePage() {
 
       <p>{t('resize.basicDesc')}</p>
 
-      <pre>
-        <code className="language-tsx">
-          {`<Drager
-  className="w-32 h-32 bg-blue-500"
-  resizable
->
-  Resizable content
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={basicUsageCode} />
 
       <div className="not-prose my-8 h-[300px] rounded-lg border overflow-hidden">
         <InfiniteCanvas>
@@ -52,18 +61,7 @@ export default function ResizePage() {
 
       <p>{t('resize.combiningDesc')}</p>
 
-      <pre>
-        <code className="language-tsx">
-          {`<Drager
-  className="w-32 h-32 bg-blue-500"
-  resizable
-  rotatable
-  scalable
->
-  Multi-feature element
-</Drager>`}
-        </code>
-      </pre>
+      <CodeBlock code={combiningCode} />
 
       <div className="not-prose my-8 h-[300px] rounded-lg border overflow-hidden">
         <InfiniteCanvas>

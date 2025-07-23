@@ -33,7 +33,7 @@ export default function LanguageSwitch() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
       >
         <Globe size={16} strokeWidth={1.5} />
         <span className="text-sm">{currentLanguage.label}</span>
@@ -41,7 +41,7 @@ export default function LanguageSwitch() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 py-1 bg-white rounded-md shadow-lg border border-gray-100 min-w-[100px]">
+        <div className="absolute right-0 mt-2 py-1 bg-white dark:bg-gray-900 rounded-md shadow-lg border border-gray-200 dark:border-gray-800 min-w-[100px]">
           {LANGUAGES.map(lang => (
             <button
               key={lang.code}
@@ -49,8 +49,10 @@ export default function LanguageSwitch() {
                 i18n.changeLanguage(lang.code)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50 ${
-                lang.code === i18n.language ? 'text-gray-900 font-medium' : 'text-gray-600'
+              className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
+                lang.code === i18n.language
+                  ? 'text-black dark:text-white font-medium'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               {lang.label}

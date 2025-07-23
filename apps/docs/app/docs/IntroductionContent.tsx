@@ -3,10 +3,36 @@
 import { Drager } from '@es-space/es-drager-react'
 import { useTranslation } from 'react-i18next'
 import { BASE_PATH } from '../../env'
+import { CodeBlock } from '../components/CodeBlock'
 import { InfiniteCanvas } from '../components/InfiniteCanvas'
 
 export function IntroductionContent() {
   const { t } = useTranslation()
+  const quickExampleCode = `import { Drager } from '@es-space/es-drager-react'
+
+function App() {
+  return (
+    <Drager
+      style={{
+        width: '128px',
+        height: '128px',
+        backgroundColor: '#3B82F6'
+      }}
+      rotatable
+      scalable
+      resizable
+      connectable
+      showGuides
+      limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
+      onConnect={({ sourceId, sourceAnchor, targetId, targetAnchor }) => {
+        console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
+      }}
+    >
+      Try me!
+    </Drager>
+  )
+}`
+
   return (
     <div className="prose prose-blue max-w-none">
       <h1>{t('introduction.title')}</h1>
@@ -104,34 +130,7 @@ export function IntroductionContent() {
 
       <h2>{t('introduction.quickExample')}</h2>
 
-      <pre className="language-tsx">
-        <code>
-          {`import { Drager } from '@es-space/es-drager-react'
-
-function App() {
-  return (
-    <Drager
-      style={{
-        width: '128px',
-        height: '128px',
-        backgroundColor: '#3B82F6'
-      }}
-      rotatable
-      scalable
-      resizable
-      connectable
-      showGuides
-      limit={{ minX: 0, maxX: 500, minY: 0, maxY: 500 }}
-      onConnect={({ sourceId, sourceAnchor, targetId, targetAnchor }) => {
-        console.log('Connected:', { sourceId, sourceAnchor, targetId, targetAnchor })
-      }}
-    >
-      Try me!
-    </Drager>
-  )
-}`}
-        </code>
-      </pre>
+      <CodeBlock code={quickExampleCode} />
 
       <h2>{t('introduction.nextSteps')}</h2>
 
