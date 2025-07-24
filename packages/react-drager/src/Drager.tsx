@@ -64,17 +64,6 @@ export const Drager: React.FC<DragerProps> = ({
   const animationFrameId = useRef<number | null>(null)
   const resizeDirection = useRef<ResizePosition | null>(null)
   const startDimensions = useRef({ width: 0, height: 0, left: 0, top: 0 })
-  const touchStartRef = useRef({ x: 0, y: 0, time: 0 })
-
-  const getCoords = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
-    if ('touches' in e && e.touches.length > 0) {
-      return { x: e.touches[0].clientX, y: e.touches[0].clientY }
-    }
-    if ('clientX' in e) {
-      return { x: e.clientX, y: e.clientY }
-    }
-    return { x: 0, y: 0 }
-  }
 
   /**
    * update the transform of the element
@@ -229,7 +218,7 @@ export const Drager: React.FC<DragerProps> = ({
    * @param position - the resize position
    * @returns the mouse event
    */
-  const handleResizeStart = (position: ResizePosition) => (e: React.MouseEvent | React.TouchEvent) => {
+  const handleResizeStart = (position: ResizePosition) => (e: React.MouseEvent) => {
     if (disabled)
       return
     e.stopPropagation()
@@ -240,8 +229,7 @@ export const Drager: React.FC<DragerProps> = ({
     resizeDirection.current = position
 
     const rect = contentRef.current.getBoundingClientRect()
-    const coords = getCoords(e)
-    startPos.current = { x: coords.x, y: coords.y }
+    startPos.current = { x: e.clientX, y: e.clientY }
     startDimensions.current = {
       width: rect.width,
       height: rect.height,
@@ -258,6 +246,16 @@ export const Drager: React.FC<DragerProps> = ({
 
     if (!content)
       return
+
+    const getCoords = (e: MouseEvent | TouchEvent) => {
+      if ('touches' in e && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      }
+      if ('clientX' in e) {
+        return { x: e.clientX, y: e.clientY }
+      }
+      return { x: 0, y: 0 }
+    }
 
     /**
      * limit the position of the element
@@ -321,10 +319,6 @@ export const Drager: React.FC<DragerProps> = ({
         return
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
-
-      if ('touches' in e) {
-        touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, time: Date.now() }
-      }
 
       if ('touches' in e && e.touches.length === 2) {
         isDragging.current = false
@@ -596,21 +590,10 @@ export const Drager: React.FC<DragerProps> = ({
     }
   }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, top, left])
 
-  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleClick = (_: React.MouseEvent) => {
     if (disabled)
       return
-
-    if ('touches' in e) {
-      const touch = e.changedTouches[0]
-      const distance = Math.hypot(touch.clientX - touchStartRef.current.x, touch.clientY - touchStartRef.current.y)
-      const duration = Date.now() - touchStartRef.current.time
-      if (distance < 5 && duration < 200) {
-        onClick?.()
-      }
-    }
-    else {
-      onClick?.()
-    }
+    onClick?.()
   }
 
   return (
@@ -629,7 +612,6 @@ export const Drager: React.FC<DragerProps> = ({
         ...style,
       }}
       onClick={handleClick}
-      onTouchEnd={handleClick}
       onBlur={onBlur}
     >
       {connectable && (

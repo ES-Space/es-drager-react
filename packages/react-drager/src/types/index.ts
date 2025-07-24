@@ -102,5 +102,5 @@ export type ResizePosition =
 
 export interface ResizeHandleProps {
   position: ResizePosition
-  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void
+  onMouseDown: (e: React.MouseEvent) => void
 }
