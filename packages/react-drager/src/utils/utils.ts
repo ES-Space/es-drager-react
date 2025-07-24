@@ -20,3 +20,17 @@ export function throttle<T extends (...args: any[]) => any>(fn: T, wait: number)
   }
   return throttled
 }
+
+export function rotatePoint(x: number, y: number, angle: number, centerX: number, centerY: number) {
+  const rad = (angle * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+
+  const dx = x - centerX
+  const dy = y - centerY
+
+  return {
+    x: centerX + dx * cos - dy * sin,
+    y: centerY + dx * sin + dy * cos,
+  }
+}

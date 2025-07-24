@@ -1,9 +1,9 @@
 import type { AnchorPosition, Connection, DragerProps, ResizePosition } from './types'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { Anchor } from './components/anchor'
 import { ResizeHandle } from './components/resize-handle'
 import RotateIcon from './icons/rotate.svg'
-import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager } from './utils'
+import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager, rotatePoint } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
   id,
@@ -64,6 +64,9 @@ export const Drager: React.FC<DragerProps> = ({
   const animationFrameId = useRef<number | null>(null)
   const resizeDirection = useRef<ResizePosition | null>(null)
   const startDimensions = useRef({ width: 0, height: 0, left: 0, top: 0 })
+  /** fix the cursor not updated when rotation is changed */
+  const [, forceUpdate] = useReducer(x => x + 1, 0)
+  const [isResizeMode, setIsResizeMode] = useState(false)
 
   /**
    * update the transform of the element
@@ -81,6 +84,123 @@ export const Drager: React.FC<DragerProps> = ({
       updateTransform()
     }
   }, [left, top])
+
+  /**
+   * handle the resize move event
+   * @param coords - the mouse coordinates
+   */
+  const handleResizeMove = (coords: { x: number, y: number }) => {
+    if (!isResizing.current || !contentRef.current || !resizeDirection.current)
+      return
+
+    const deltaX = coords.x - startPos.current.x
+    const deltaY = coords.y - startPos.current.y
+
+    const rad = (-currentRotation.current * Math.PI) / 180
+    const cos = Math.cos(rad)
+    const sin = Math.sin(rad)
+
+    const localDeltaX = deltaX * cos - deltaY * sin
+    const localDeltaY = deltaX * sin + deltaY * cos
+
+    let newWidth = startDimensions.current.width
+    let newHeight = startDimensions.current.height
+
+    switch (resizeDirection.current) {
+      case 'right':
+        newWidth = startDimensions.current.width + localDeltaX
+        break
+      case 'left':
+        newWidth = startDimensions.current.width - localDeltaX
+        break
+      case 'bottom':
+        newHeight = startDimensions.current.height + localDeltaY
+        break
+      case 'top':
+        newHeight = startDimensions.current.height - localDeltaY
+        break
+      case 'top-right':
+        newWidth = startDimensions.current.width + localDeltaX
+        newHeight = startDimensions.current.height - localDeltaY
+        break
+      case 'top-left':
+        newWidth = startDimensions.current.width - localDeltaX
+        newHeight = startDimensions.current.height - localDeltaY
+        break
+      case 'bottom-right':
+        newWidth = startDimensions.current.width + localDeltaX
+        newHeight = startDimensions.current.height + localDeltaY
+        break
+      case 'bottom-left':
+        newWidth = startDimensions.current.width - localDeltaX
+        newHeight = startDimensions.current.height + localDeltaY
+        break
+    }
+
+    const computedStyle = window.getComputedStyle(contentRef.current)
+    const minWidth = Number.parseInt(computedStyle.minWidth) || 20
+    const minHeight = Number.parseInt(computedStyle.minHeight) || 20
+    const maxWidth = Number.parseInt(computedStyle.maxWidth) || Infinity
+    const maxHeight = Number.parseInt(computedStyle.maxHeight) || Infinity
+
+    const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth)
+    const constrainedHeight = Math.min(Math.max(newHeight, minHeight), maxHeight)
+
+    const widthDiff = constrainedWidth - startDimensions.current.width
+    const heightDiff = constrainedHeight - startDimensions.current.height
+
+    let localOffsetX = 0
+    let localOffsetY = 0
+
+    switch (resizeDirection.current) {
+      case 'right':
+        localOffsetX = 0
+        localOffsetY = 0
+        break
+      case 'left':
+        localOffsetX = -widthDiff
+        localOffsetY = 0
+        break
+      case 'bottom':
+        localOffsetX = 0
+        localOffsetY = 0
+        break
+      case 'top':
+        localOffsetX = 0
+        localOffsetY = -heightDiff
+        break
+      case 'top-right':
+        localOffsetX = 0
+        localOffsetY = -heightDiff
+        break
+      case 'top-left':
+        localOffsetX = -widthDiff
+        localOffsetY = -heightDiff
+        break
+      case 'bottom-right':
+        localOffsetX = 0
+        localOffsetY = 0
+        break
+      case 'bottom-left':
+        localOffsetX = -widthDiff
+        localOffsetY = 0
+        break
+    }
+
+    const globalOffsetX = localOffsetX * cos + localOffsetY * sin
+    const globalOffsetY = -localOffsetX * sin + localOffsetY * cos
+
+    contentRef.current.style.width = `${constrainedWidth}px`
+    contentRef.current.style.height = `${constrainedHeight}px`
+
+    currentPos.current = {
+      x: startDimensions.current.left + globalOffsetX,
+      y: startDimensions.current.top + globalOffsetY,
+    }
+
+    updateTransform()
+    onResize?.({ width: constrainedWidth, height: constrainedHeight })
+  }
 
   /**
    * handle the anchor drag event
@@ -221,18 +341,22 @@ export const Drager: React.FC<DragerProps> = ({
   const handleResizeStart = (position: ResizePosition) => (e: React.MouseEvent) => {
     if (disabled)
       return
+
     e.stopPropagation()
+    e.preventDefault()
+
     if (!contentRef.current)
       return
 
     isResizing.current = true
     resizeDirection.current = position
 
-    const rect = contentRef.current.getBoundingClientRect()
     startPos.current = { x: e.clientX, y: e.clientY }
+
+    const computedStyle = window.getComputedStyle(contentRef.current)
     startDimensions.current = {
-      width: rect.width,
-      height: rect.height,
+      width: Number.parseFloat(computedStyle.width) || contentRef.current.offsetWidth,
+      height: Number.parseFloat(computedStyle.height) || contentRef.current.offsetHeight,
       left: currentPos.current.x,
       top: currentPos.current.y,
     }
@@ -320,6 +444,12 @@ export const Drager: React.FC<DragerProps> = ({
       if (rotateHandle && rotateHandle.contains(e.target as Node))
         return
 
+      const target = e.target as HTMLElement
+      const isResizeHandle = target.closest('[data-resize-handle]') !== null
+      if (isResizeHandle) {
+        return
+      }
+
       if ('touches' in e && e.touches.length === 2) {
         isDragging.current = false
         isGesture.current = true
@@ -365,6 +495,7 @@ export const Drager: React.FC<DragerProps> = ({
         const newAngle = Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX) * 180 / Math.PI
         const angleDiff = newAngle - startAngle.current
         currentRotation.current = startRotation.current.rotation + angleDiff
+        forceUpdate()
         onRotate?.(currentRotation.current)
 
         updateTransform()
@@ -424,6 +555,7 @@ export const Drager: React.FC<DragerProps> = ({
         const currentAngle = Math.atan2(coords.y - centerY, coords.x - centerX) * 180 / Math.PI
         const angleDiff = currentAngle - startRotation.current.angle
         currentRotation.current = startRotation.current.rotation + angleDiff
+        forceUpdate()
         onRotate?.(currentRotation.current)
         requestAnimationFrame(() => {
           updateTransform()
@@ -433,64 +565,8 @@ export const Drager: React.FC<DragerProps> = ({
       }
 
       if (isResizing.current && contentRef.current && resizeDirection.current) {
-        const offsetX = coords.x - startPos.current.x
-        const offsetY = coords.y - startPos.current.y
-        const newDimensions = { ...startDimensions.current }
-
-        switch (resizeDirection.current) {
-          case 'right':
-            newDimensions.width += offsetX
-            break
-          case 'left':
-            newDimensions.width -= offsetX
-            newDimensions.left += offsetX
-            break
-          case 'bottom':
-            newDimensions.height += offsetY
-            break
-          case 'top':
-            newDimensions.height -= offsetY
-            newDimensions.top += offsetY
-            break
-          case 'top-right':
-            newDimensions.width += offsetX
-            newDimensions.height -= offsetY
-            newDimensions.top += offsetY
-            break
-          case 'top-left':
-            newDimensions.width -= offsetX
-            newDimensions.height -= offsetY
-            newDimensions.left += offsetX
-            newDimensions.top += offsetY
-            break
-          case 'bottom-right':
-            newDimensions.width += offsetX
-            newDimensions.height += offsetY
-            break
-          case 'bottom-left':
-            newDimensions.width -= offsetX
-            newDimensions.height += offsetY
-            newDimensions.left += offsetX
-            break
-        }
-
-        newDimensions.width = Math.max(newDimensions.width, 20)
-        newDimensions.height = Math.max(newDimensions.height, 20)
-
-        const computedStyle = window.getComputedStyle(contentRef.current)
-        const minWidth = Number.parseInt(computedStyle.minWidth) || 20
-        const minHeight = Number.parseInt(computedStyle.minHeight) || 20
-        const maxWidth = Number.parseInt(computedStyle.maxWidth) || Infinity
-        const maxHeight = Number.parseInt(computedStyle.maxHeight) || Infinity
-
-        newDimensions.width = Math.min(Math.max(newDimensions.width, minWidth), maxWidth)
-        newDimensions.height = Math.min(Math.max(newDimensions.height, minHeight), maxHeight)
-
-        contentRef.current.style.width = `${newDimensions.width}px`
-        contentRef.current.style.height = `${newDimensions.height}px`
-        currentPos.current = { x: newDimensions.left, y: newDimensions.top }
-        updateTransform()
-        onResize?.({ width: newDimensions.width, height: newDimensions.height })
+        const coords = getCoords(e)
+        handleResizeMove(coords)
       }
     }
 
@@ -590,9 +666,15 @@ export const Drager: React.FC<DragerProps> = ({
     }
   }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, top, left])
 
-  const handleClick = (_: React.MouseEvent) => {
+  const handleDoubleClick = (e: React.MouseEvent) => {
     if (disabled)
       return
+
+    if (connectable && resizable) {
+      e.stopPropagation()
+      setIsResizeMode(!isResizeMode)
+    }
+
     onClick?.()
   }
 
@@ -609,12 +691,14 @@ export const Drager: React.FC<DragerProps> = ({
         transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
         opacity: disabled ? 0.6 : 1,
         touchAction: 'none', // Prevent default touch actions like scrolling
+        outline: connectable && resizable && isResizeMode ? '2px dashed #3b82f6' : 'none',
         ...style,
       }}
-      onClick={handleClick}
+      onClick={onClick}
+      onDoubleClick={handleDoubleClick}
       onBlur={onBlur}
     >
-      {connectable && (
+      {connectable && (!resizable || !isResizeMode) && (
         <>
           <Anchor position="top" onDragStart={handleAnchorDragStart} />
           <Anchor position="right" onDragStart={handleAnchorDragStart} />
@@ -644,17 +728,27 @@ export const Drager: React.FC<DragerProps> = ({
           <img src={RotateIcon} style={{ width: '16px', height: '16px' }} />
         </div>
       )}
-      {resizable && (
-        <>
-          <ResizeHandle position="top" onMouseDown={e => handleResizeStart('top')(e)} />
-          <ResizeHandle position="bottom" onMouseDown={e => handleResizeStart('bottom')(e)} />
-          <ResizeHandle position="left" onMouseDown={e => handleResizeStart('left')(e)} />
-          <ResizeHandle position="right" onMouseDown={e => handleResizeStart('right')(e)} />
-          <ResizeHandle position="top-right" onMouseDown={e => handleResizeStart('top-right')(e)} />
-          <ResizeHandle position="top-left" onMouseDown={e => handleResizeStart('top-left')(e)} />
-          <ResizeHandle position="bottom-right" onMouseDown={e => handleResizeStart('bottom-right')(e)} />
-          <ResizeHandle position="bottom-left" onMouseDown={e => handleResizeStart('bottom-left')(e)} />
-        </>
+      {resizable && (!connectable || isResizeMode) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            transformOrigin: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          {['top', 'bottom', 'left', 'right', 'top-right', 'top-left', 'bottom-right', 'bottom-left'].map(position => (
+            <ResizeHandle
+              key={position}
+              position={position as ResizePosition}
+              rotation={currentRotation.current}
+              onMouseDown={e => handleResizeStart(position as ResizePosition)(e)}
+            />
+          ))}
+        </div>
       )}
     </div>
   )

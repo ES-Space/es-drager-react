@@ -76,7 +76,6 @@ function App() {
               top: '50px',
             }}
             rotatable
-            scalable
             resizable
           >
             Basic
@@ -98,6 +97,8 @@ function App() {
               top: '150px',
             }}
             connectable
+            scalable
+            resizable
           >
             Connections
           </Drager>
@@ -118,7 +119,6 @@ function App() {
               top: '250px',
             }}
             rotatable
-            scalable
             resizable
             connectable
             showGuides
