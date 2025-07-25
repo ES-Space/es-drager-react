@@ -1,9 +1,10 @@
-import type { AnchorPosition, Connection, DragerProps, ResizePosition } from './types'
+import type { AnchorPosition, Connection, DragerProps, ResizePosition, SkewPosition } from './types'
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { Anchor } from './components/anchor'
 import { ResizeHandle } from './components/resize-handle'
+import { SkewHandle } from './components/skew-handle'
 import RotateIcon from './icons/rotate.svg'
-import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager, rotatePoint } from './utils'
+import { ConnectionManager, getAnchorPosition, getDragerElements, getSnapPosition, GuidelineManager } from './utils'
 
 export const Drager: React.FC<DragerProps> = ({
   id,
@@ -17,6 +18,11 @@ export const Drager: React.FC<DragerProps> = ({
   left = 0,
   limit,
   rotation = 0,
+  skewable = false,
+  skewX = 0,
+  skewY = 0,
+  minSkew = -45,
+  maxSkew = 45,
   rotatable = false,
   scalable = false,
   resizable = false,
@@ -35,6 +41,7 @@ export const Drager: React.FC<DragerProps> = ({
   onScale,
   onConnect,
   onResize,
+  onSkew,
 }) => {
   /** id is required when connectable is true */
   if (connectable && !id) {
@@ -49,9 +56,11 @@ export const Drager: React.FC<DragerProps> = ({
     y: top ?? (style?.top ? Number.parseInt(style.top as string) : 0),
   })
   const currentRotation = useRef(rotation)
+  const currentSkew = useRef({ x: skewX, y: skewY })
   const isDragging = useRef(false)
   const isRotating = useRef(false)
   const isResizing = useRef(false)
+  const isSkewing = useRef(false)
   const isGesture = useRef(false)
   const startDist = useRef(0)
   const startAngle = useRef(0)
@@ -60,6 +69,7 @@ export const Drager: React.FC<DragerProps> = ({
   const connectingAnchor = useRef<AnchorPosition | null>(null)
   const currentMousePos = useRef({ x: 0, y: 0 })
   const startRotation = useRef({ angle: 0, rotation: 0 })
+  const startSkew = useRef({ x: 0, y: 0, skewX: 0, skewY: 0 })
   const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null)
   const animationFrameId = useRef<number | null>(null)
   const resizeDirection = useRef<ResizePosition | null>(null)
@@ -73,7 +83,13 @@ export const Drager: React.FC<DragerProps> = ({
    */
   const updateTransform = () => {
     if (contentRef.current) {
-      contentRef.current.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`
+      const transforms = [
+        `translate(${currentPos.current.x}px, ${currentPos.current.y}px)`,
+        `rotate(${currentRotation.current}deg)`,
+        `scale(${currentScale.current})`,
+        `skew(${currentSkew.current.x}deg, ${currentSkew.current.y}deg)`,
+      ]
+      contentRef.current.style.transform = transforms.join(' ')
     }
   }
 
@@ -81,9 +97,37 @@ export const Drager: React.FC<DragerProps> = ({
     // initialize the position and size
     if (contentRef.current) {
       currentPos.current = { x: left, y: top }
+      currentSkew.current = { x: skewX, y: skewY }
       updateTransform()
     }
-  }, [left, top])
+  }, [left, top, skewX, skewY])
+
+  /**
+   * handle the skew move event
+   * @param coords - the mouse coordinates
+   */
+  const handleSkewMove = (coords: { x: number, y: number }) => {
+    if (!isSkewing.current)
+      return
+
+    const deltaX = coords.x - startSkew.current.x
+    const deltaY = coords.y - startSkew.current.y
+    const sensitivity = 0.3
+
+    const newSkewX = Math.min(Math.max(
+      startSkew.current.skewX + deltaX * sensitivity,
+      minSkew,
+    ), maxSkew)
+
+    const newSkewY = Math.min(Math.max(
+      startSkew.current.skewY + deltaY * sensitivity,
+      minSkew,
+    ), maxSkew)
+
+    currentSkew.current = { x: newSkewX, y: newSkewY }
+    updateTransform()
+    onSkew?.(currentSkew.current)
+  }
 
   /**
    * handle the resize move event
@@ -334,6 +378,27 @@ export const Drager: React.FC<DragerProps> = ({
   }
 
   /**
+   * handle the skew start event
+   * @param e - the mouse event
+   */
+  const handleSkewStart = (e: React.MouseEvent) => {
+    if (disabled)
+      return
+
+    e.stopPropagation()
+    e.preventDefault()
+
+    isSkewing.current = true
+
+    startSkew.current = {
+      x: e.clientX,
+      y: e.clientY,
+      skewX: currentSkew.current.x,
+      skewY: currentSkew.current.y,
+    }
+  }
+
+  /**
    * handle the resize start event
    * @param position - the resize position
    * @returns the mouse event
@@ -446,7 +511,8 @@ export const Drager: React.FC<DragerProps> = ({
 
       const target = e.target as HTMLElement
       const isResizeHandle = target.closest('[data-resize-handle]') !== null
-      if (isResizeHandle) {
+      const isSkewHandle = target.closest('[data-skew-handle]') !== null
+      if (isResizeHandle || isSkewHandle) {
         return
       }
 
@@ -568,6 +634,11 @@ export const Drager: React.FC<DragerProps> = ({
         const coords = getCoords(e)
         handleResizeMove(coords)
       }
+
+      if (isSkewing.current) {
+        const coords = getCoords(e)
+        handleSkewMove(coords)
+      }
     }
 
     const handleDragEnd = (e: MouseEvent | TouchEvent) => {
@@ -590,6 +661,9 @@ export const Drager: React.FC<DragerProps> = ({
       if (isResizing.current) {
         isResizing.current = false
         resizeDirection.current = null
+      }
+      if (isSkewing.current) {
+        isSkewing.current = false
       }
     }
 
@@ -664,7 +738,7 @@ export const Drager: React.FC<DragerProps> = ({
         anchor.removeEventListener('mousedown', listener)
       })
     }
-  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, limit, rotatable, rotation, scalable, minScale, maxScale, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, top, left])
+  }, [onDrag, onDragEnd, onDragStart, onRotate, onScale, onConnect, onSkew, limit, rotatable, rotation, scalable, skewable, minScale, maxScale, minSkew, maxSkew, showGuides, snapThreshold, snapToElements, id, mousePos, disabled, top, left])
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     if (disabled)
@@ -688,7 +762,7 @@ export const Drager: React.FC<DragerProps> = ({
         position: 'absolute',
         userSelect: 'none',
         cursor: disabled ? 'not-allowed' : (draggable ? 'move' : 'default'),
-        transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current})`,
+        transform: `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${currentRotation.current}deg) scale(${currentScale.current}) skew(${currentSkew.current.x}deg, ${currentSkew.current.y}deg)`,
         opacity: disabled ? 0.6 : 1,
         touchAction: 'none', // Prevent default touch actions like scrolling
         outline: connectable && resizable && isResizeMode ? '2px dashed #3b82f6' : 'none',
@@ -749,6 +823,12 @@ export const Drager: React.FC<DragerProps> = ({
             />
           ))}
         </div>
+      )}
+      {skewable && (
+        <SkewHandle
+          rotation={currentRotation.current}
+          onMouseDown={handleSkewStart}
+        />
       )}
     </div>
   )

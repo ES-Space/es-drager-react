@@ -51,6 +51,11 @@ export function Examples() {
     console.log('connect')
   }
 
+  const handleSkew = (skew: { x: number, y: number }) => {
+    // eslint-disable-next-line no-console
+    console.log('skew changed:', skew)
+  }
+
   return (
     <div className="flex-1 p-8 relative">
       <div className="absolute inset-0 bg-white dark:bg-black">
@@ -168,6 +173,32 @@ export function Examples() {
           </div>
 
           <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
+            <h3 className="text-sm font-medium mb-4">{t('examples.withSkew')}</h3>
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500"
+                skewable
+                skewX={0}
+                skewY={0}
+                minSkew={-30}
+                maxSkew={30}
+                onSkew={handleSkew}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-xs font-medium">{t('examples.skewableBox')}</div>
+                  <div className="text-[10px] text-gray-400">{t('examples.dragEdgesToSkew')}</div>
+                </div>
+              </Drager>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-8 mt-8">
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
             <h3 className="text-sm font-medium mb-4">{t('examples.withSnapping')}</h3>
             <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <Drager
@@ -215,6 +246,33 @@ export function Examples() {
                 <div className="flex flex-col items-center justify-center w-full gap-1">
                   <div className="text-xs font-medium">{t('examples.resizableBox')}</div>
                   <div className="text-[10px] text-gray-400">{t('examples.dragToResize')}</div>
+                </div>
+              </Drager>
+            </div>
+          </div>
+
+          <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm">
+            <h3 className="text-sm font-medium mb-4">{t('examples.combined')}</h3>
+            <div className="h-[200px] relative border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <Drager
+                style={{
+                  left: '4px',
+                  top: '4px',
+                }}
+                className="w-32 h-32 border-2 border-dashed border-blue-500 cursor-move flex items-center justify-center text-blue-500 text-center"
+                rotatable
+                scalable
+                resizable
+                skewable
+                minScale={0.5}
+                maxScale={2}
+                minSkew={-20}
+                maxSkew={20}
+                onSkew={handleSkew}
+              >
+                <div className="flex flex-col items-center justify-center w-full gap-1">
+                  <div className="text-xs font-medium">{t('examples.combinedBox')}</div>
+                  <div className="text-[10px] text-gray-400">{t('examples.allFeatures')}</div>
                 </div>
               </Drager>
             </div>

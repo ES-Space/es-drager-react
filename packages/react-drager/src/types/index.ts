@@ -28,6 +28,16 @@ export interface DragerProps {
   }
   /** rotation of the element */
   rotation?: number
+  /** whether the element is skewable */
+  skewable?: boolean
+  /** X-axis skew angle */
+  skewX?: number
+  /** Y-axis skew angle */
+  skewY?: number
+  /** minimum skew angle */
+  minSkew?: number
+  /** maximum skew angle */
+  maxSkew?: number
   /** whether the element is rotatable */
   rotatable?: boolean
   /** whether the element is scalable */
@@ -64,6 +74,8 @@ export interface DragerProps {
   onConnect?: (connection: Connection) => void
   /** callback when resizing */
   onResize?: (size: { width: number, height: number }) => void
+  /** callback when skewing */
+  onSkew?: (skew: { x: number, y: number }) => void
 }
 
 /** anchor position */
@@ -102,6 +114,13 @@ export type ResizePosition =
 
 export interface ResizeHandleProps {
   position: ResizePosition
+  onMouseDown: (e: React.MouseEvent) => void
+  rotation?: number
+}
+
+export type SkewPosition = 'skew-x' | 'skew-y'
+
+export interface SkewHandleProps {
   onMouseDown: (e: React.MouseEvent) => void
   rotation?: number
 }
