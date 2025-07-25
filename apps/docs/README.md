@@ -8,6 +8,22 @@
   A lightweight React component for creating draggable, rotatable and scalable elements with connection capabilities.
 </p>
 
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
+  <a href="https://discord.gg/pg82AQjN">
+    <img src="https://img.shields.io/discord/1398256764654321746?color=7289da&logo=discord&logoColor=white" alt="Discord" />
+  </a>
+  <a href="https://www.npmjs.com/package/@es-space/es-drager-react">
+    <img src="https://img.shields.io/npm/v/@es-space/es-drager-react.svg" alt="npm version" />
+  </a>
+  <a href="https://github.com/ES-Space/es-drager-react/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/@es-space/es-drager-react.svg" alt="license" />
+  </a>
+</p>
+
 ## ✨ Features
 
 - 🎯 Drag & drop with constraints
@@ -239,6 +255,12 @@ bun dev
 # Build package
 bun build
 ```
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+Join our [Discord community](https://discord.gg/pg82AQjN) to discuss ideas and get help.
 
 ## 📄 License
 
